@@ -1,0 +1,40 @@
+.container {
+  width: 100%;
+  max-width: 1250px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.signup-link {
+  font-weight: 400;
+  padding: 0 3px;
+  color: #1995f6;
+}
+.footerList {
+  display: flex;
+}
+
+.footerList li {
+  font-size: 12px;
+  font-weight: bold;
+  color: #004689;
+  margin-right: 15px;
+  cursor: pointer;
+}
+
+.left-side-mobile {
+  background-image: url(../images/background.png);
+  height: 100%;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  background-position: top right;
+}
+
+.boldText {
+  font-weight: bold;
+  cursor: pointer;
+}
