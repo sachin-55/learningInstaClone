@@ -36,9 +36,13 @@ const Header = () => {
           sx={{
             fontFamily: 'Engagement, cursive',
             fontSize: '30px',
+            cursor: 'pointer',
+            '&:active': {
+              color: 'darkGray',
+            },
           }}
         >
-          Instagram
+          <Link to="/">Instagram</Link>
         </Box>
         <Box>
           <Input

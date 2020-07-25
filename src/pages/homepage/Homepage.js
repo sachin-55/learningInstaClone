@@ -1,7 +1,10 @@
 import React from 'react';
 import { Box, Container, Image } from 'theme-ui';
+import { Link } from 'react-router-dom';
 import Header from './Header';
 import Story from './Story';
+import Suggestions from './Suggestions';
+import Post from './Post';
 
 const Homepage = () => {
   return (
@@ -15,11 +18,11 @@ const Homepage = () => {
           justifyContent: 'space-between',
         }}
       >
-        <Box
-          sx={{ bg: 'pink', flex: 1, height: '200vh', width: '100%' }}
-        >
+        <Box sx={{ bg: 'pink', flex: 1, width: '100%' }}>
           <Story />
+          <Post />
         </Box>
+
         <Box sx={{ width: '320px' }}>
           <Box
             sx={{
@@ -46,21 +49,21 @@ const Homepage = () => {
               </Box>
               <Box />
             </Box>
-            <Box sx={{ bg: 'black', color: '#fff', width: '100%' }}>
-              Suggestions
+            <Box sx={{ width: '100%' }}>
+              <Suggestions />
             </Box>
             <Box className="sideFooter">
-              <a>About</a>
-              <a>Help</a>
-              <a>Press</a>
-              <a>API</a>
-              <a>Jobs</a>
-              <a>Privacy</a>
-              <a>Terms</a>
-              <a>Locations</a>
-              <a>Top Accounts</a>
-              <a>Hashtags</a>
-              <a>Language</a>
+              <Link to="/">About</Link>
+              <Link to="/">Help</Link>
+              <Link to="/">Press</Link>
+              <Link to="/">API</Link>
+              <Link to="/">Jobs</Link>
+              <Link to="/">Privacy</Link>
+              <Link to="/">Terms</Link>
+              <Link to="/">Locations</Link>
+              <Link to="/">Top Accounts</Link>
+              <Link to="/">Hashtags</Link>
+              <Link to="/">Language</Link>
             </Box>
             <Box
               sx={{
