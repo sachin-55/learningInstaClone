@@ -20,10 +20,11 @@ export default {
   colors: {
     text: '#222',
     darkText: '#c2c2c2',
+    lightGray: '#dbdbdb',
+    darkGray: '#8e8e8e',
     background: '#fafafa',
-    secondaryBackground: '#fff',
-    primary: '#E84855',
-    secondary: '#2D3047',
+    primary: '#183f73',
+    secondary: '#385084',
     muted: '#808080',
     accent: '#1B998B',
     highlight: '#FFFD82',
@@ -146,6 +147,16 @@ export default {
     },
   },
   images: {
+    navBar: {
+      width: 25,
+      height: 25,
+      borderRadius: 99999,
+    },
+    profileLink: {
+      width: 50,
+      height: 50,
+      borderRadius: 99999,
+    },
     primary: {
       cursor: 'pointer',
     },

@@ -12,7 +12,7 @@ import secondImage from '../images/secondImage.jpg';
 import ButtonCustom from '../components/ButtonCustom';
 import Footer from '../components/Footer';
 
-const Landingpage = () => {
+const Landingpage = (props) => {
   const [imageMob, setImageMob] = React.useState(firstImage);
   const toggleImage = () => {
     setTimeout(() => {
@@ -108,7 +108,12 @@ const Landingpage = () => {
                   '&::placeholder': { color: '#94979b' },
                 }}
               />
-              <ButtonCustom disabled>Log In</ButtonCustom>
+              <ButtonCustom
+                // disabled
+                onClick={props.clickLogin}
+              >
+                Log In
+              </ButtonCustom>
             </Box>
             <Box
               sx={{

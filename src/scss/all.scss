@@ -38,3 +38,29 @@ a {
   font-weight: bold;
   cursor: pointer;
 }
+.marginLeft {
+  margin-left: 25px;
+}
+.sideFooter {
+  padding: 30px 0;
+  display: flex;
+  flex-wrap: wrap;
+}
+.sideFooter a {
+  color: #dbdbdb;
+  font-size: 11px;
+  position: relative;
+  margin-right: 10px;
+}
+.sideFooter a::after {
+  content: '.';
+  position: absolute;
+  font-size: 15px;
+  font-weight: bold;
+  top: -7px;
+  right: -6px;
+}
+.sideFooter a:last-child::after {
+  content: '';
+  position: absolute;
+}
