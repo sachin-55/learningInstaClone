@@ -18,8 +18,11 @@ const Homepage = () => {
           justifyContent: 'space-between',
         }}
       >
-        <Box sx={{ bg: 'pink', flex: 1, width: '100%' }}>
+        <Box sx={{ flex: 1, width: '100%' }}>
           <Story />
+          <Post />
+          <Post />
+          <Post />
           <Post />
         </Box>
 
@@ -43,7 +46,7 @@ const Homepage = () => {
                 variant="profileLink"
                 src="https://media.sproutsocial.com/uploads/2017/02/10x-featured-social-media-image-size.png"
               />
-              <Box sx={{ padding: '15px' }}>
+              <Box sx={{ padding: '15px', marginBottom: '20px' }}>
                 <Box sx={{ fontWeight: 'bold' }}> Username</Box>
                 <Box sx={{ color: 'darkGray' }}>FullName</Box>
               </Box>

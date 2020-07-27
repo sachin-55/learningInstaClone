@@ -15,7 +15,7 @@ import SignupPage from './pages/SignupPage';
 import Homepage from './pages/homepage/Homepage';
 
 const App = () => {
-  const [login, setLogin] = useState(false);
+  const [login, setLogin] = useState(true);
   return (
     <ThemeProvider theme={theme}>
       <Router>

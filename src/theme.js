@@ -145,6 +145,13 @@ export default {
       margin: '8px 0',
       fontWeight: 700,
     },
+    clearBtn: {
+      backgroundColor: 'transparent',
+      fontSize: '14px',
+      margin: '8px 0',
+      fontWeight: 700,
+      color: '#0195f6',
+    },
   },
   images: {
     navBar: {
@@ -155,6 +162,16 @@ export default {
     profileLink: {
       width: 50,
       height: 50,
+      borderRadius: 99999,
+    },
+    postProfileImg: {
+      width: 34,
+      height: 34,
+      borderRadius: 99999,
+    },
+    suggestionProfileImg: {
+      width: 35,
+      height: 35,
       borderRadius: 99999,
     },
     primary: {
