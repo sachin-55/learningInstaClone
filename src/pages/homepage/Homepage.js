@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, Container, Image } from 'theme-ui';
 import { Link } from 'react-router-dom';
-import Header from './Header';
+import Header from '../../components/Header';
 import Story from './Story';
 import Suggestions from './Suggestions';
 import Post from './Post';

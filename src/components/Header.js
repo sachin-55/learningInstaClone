@@ -71,7 +71,7 @@ const Header = () => {
           <Link to="/" className="marginLeft">
             <FontAwesomeIcon icon={faHome} />
           </Link>
-          <Link to="/" className="marginLeft">
+          <Link to="/direct/inbox" className="marginLeft">
             <FontAwesomeIcon icon={faPaperPlane} />
           </Link>
           <Link to="/" className="marginLeft">

@@ -169,6 +169,11 @@ export default {
       height: 34,
       borderRadius: 99999,
     },
+    inboxProfileImg: {
+      width: 25,
+      height: 25,
+      borderRadius: 99999,
+    },
     suggestionProfileImg: {
       width: 35,
       height: 35,
