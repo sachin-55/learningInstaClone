@@ -32,7 +32,7 @@ const MessagePage = () => {
   }, [socket]);
 
   const joinRoom = () => {
-    socket = socketIOClient('https://instatwo.herokuapp.com/');
+    socket = socketIOClient(process.env.HOST_API);
 
     socket.emit(
       'join',
