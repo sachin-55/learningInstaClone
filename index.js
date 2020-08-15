@@ -4,7 +4,7 @@ import { hot } from 'react-hot-loader/root';
 import { jsx } from 'theme-ui';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import App from './App';
+import App from './src/App';
 
 const Index = hot(() => {
   return <App />;

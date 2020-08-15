@@ -16,7 +16,7 @@ const envKeys = Object.keys(env).reduce((prev, next) => {
 module.exports = () => {
   return {
     entry: [
-      './src/index.js', // Your appʼs entry point
+      './index.js', // Your appʼs entry point
     ],
     output: {
       path: path.resolve(__dirname, 'build'),
