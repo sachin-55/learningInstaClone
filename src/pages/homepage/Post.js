@@ -9,7 +9,7 @@ import {
   faComment,
 } from '@fortawesome/free-regular-svg-icons';
 
-const Post = () => {
+const Post = ({ srcUrl }) => {
   return (
     <Box
       sx={{
@@ -51,7 +51,7 @@ const Post = () => {
         <Image
           sx={{ width: '100%', height: '100%' }}
           // src="https://media.sproutsocial.com/uploads/2017/02/10x-featured-social-media-image-size.png"
-          src="https://images.pexels.com/photos/1236701/pexels-photo-1236701.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500"
+          src={srcUrl}
         />
       </Box>
       <Box

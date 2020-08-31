@@ -18,10 +18,10 @@ const Homepage = () => {
       >
         <Box sx={{ flex: 1, width: '100%' }}>
           <Story />
-          <Post />
-          <Post />
-          <Post />
-          <Post />
+          <Post srcUrl="https://picsum.photos/id/301/500/600" />
+          <Post srcUrl="https://picsum.photos/id/10/500/600" />
+          <Post srcUrl="https://picsum.photos/id/200/500/600" />
+          <Post srcUrl="https://picsum.photos/id/400/500/600" />
         </Box>
 
         <Box sx={{ width: '320px' }}>
