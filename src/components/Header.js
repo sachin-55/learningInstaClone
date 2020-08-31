@@ -1,96 +1,130 @@
-import React from 'react';
-import { Box, Container, Input, Avatar, Image } from 'theme-ui';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import React, { useState, useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import {
-  faHeart,
-  faCompass,
-  faPaperPlane,
-} from '@fortawesome/free-regular-svg-icons';
-import { faHome } from '@fortawesome/free-solid-svg-icons';
-import { Link } from 'react-router-dom';
+  AppBar,
+  Typography,
+  Toolbar,
+  IconButton,
+  Box,
+  Container,
+  Avatar,
+} from '@material-ui/core';
+import { makeStyles } from '@material-ui/styles';
+import HomeIcon from '@material-ui/icons/Home';
+import HomeOutlinedIcon from '@material-ui/icons/HomeOutlined';
+import SendIcon from '@material-ui/icons/Send';
+import SendOutlinedIcon from '@material-ui/icons/SendOutlined';
+import ExploreIcon from '@material-ui/icons/Explore';
+import ExploreOutlinedIcon from '@material-ui/icons/ExploreOutlined';
+import FavoriteIcon from '@material-ui/icons/Favorite';
+import FavoriteBorderOutlinedIcon from '@material-ui/icons/FavoriteBorderOutlined';
 
-const Header = () => {
+const useStyles = makeStyles((theme) => ({
+  instagram: {
+    color: '#000',
+    fontSize: '30px',
+    fontFamily: 'Engagement, cursive',
+  },
+  appBar: {
+    backgroundColor: '#fff',
+    borderBottom: `1px solid #dbdbdb`,
+    height: '54px',
+  },
+  toolbar: {
+    margin: '-5px 0',
+    padding: '0px',
+  },
+  wrapper: {
+    width: '70%',
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  iconWrapper: {
+    display: 'flex',
+    alignItems: 'center',
+  },
+  icon: {
+    color: '#000',
+    fontSize: '28px',
+  },
+  avatarIcon: {
+    marginLeft: '10px',
+    height: '28px',
+    width: '28px',
+    border: (props) =>
+      props.path === '/profile' ? '2px solid black' : 'none',
+  },
+}));
+
+const Header2 = () => {
+  const location = useLocation();
+  const classes = useStyles({ path: location.pathname });
+  const [activePage, setActivePage] = useState(location.pathname);
+  useEffect(() => {
+    setActivePage(location.pathname);
+  }, [location]);
   return (
-    <Box
-      sx={{
-        width: '100%',
-        bg: '#fff',
-        borderBottom: '1px solid #dbdbdb ',
-        position: 'fixed',
-        top: '0',
-        zIndex: 10,
-      }}
-    >
-      <Container
-        sx={{
-          width: '70%',
-          minWidth: '950px',
-          paddingY: '20px',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          height: '54px',
-        }}
-      >
-        <Box
-          sx={{
-            fontFamily: 'Engagement, cursive',
-            fontSize: '30px',
-            cursor: 'pointer',
-            '&:active': {
-              color: 'darkGray',
-            },
-          }}
-        >
-          <Link to="/">Instagram</Link>
-        </Box>
-        <Box>
-          <Input
-            sx={{
-              height: '18px',
-              outline: 'none',
-              fontFamily: 'FontAwesome',
-              textAlign: 'center',
-              fontWeight: 100,
-              fontSize: '12px',
-              width: '200px',
-              '&::placeholder': {
-                color: '#8e8e8e',
-              },
-            }}
-            placeholder="&#xf002;  Search"
-          />
-        </Box>
-        <Box
-          sx={{
-            fontSize: '24px',
-            display: 'flex',
-            alignItems: 'center',
-          }}
-        >
-          <Link to="/" className="marginLeft">
-            <FontAwesomeIcon icon={faHome} />
-          </Link>
-          <Link to="/direct/inbox" className="marginLeft">
-            <FontAwesomeIcon icon={faPaperPlane} />
-          </Link>
-          <Link to="/" className="marginLeft">
-            <FontAwesomeIcon icon={faCompass} />
-          </Link>
-          <Link to="/" className="marginLeft">
-            <FontAwesomeIcon icon={faHeart} />
-          </Link>
-          <Link to="/" className="marginLeft">
-            <Image
-              sx={{ marginTop: '10px' }}
-              variant="navBar"
-              src="https://media.sproutsocial.com/uploads/2017/02/10x-featured-social-media-image-size.png"
-            />
-          </Link>
-        </Box>
-      </Container>
-    </Box>
+    <AppBar position="fixed" className={classes.appBar} elevation={0}>
+      <Toolbar className={classes.toolbar}>
+        <Container className={classes.wrapper} disableGutters>
+          <Typography className={classes.instagram}>
+            Instagram
+          </Typography>
+          <Box className={classes.iconWrapper}>
+            <Link to="/">
+              <IconButton>
+                {activePage === '/' ? (
+                  <HomeIcon className={classes.icon} />
+                ) : (
+                  <HomeOutlinedIcon className={classes.icon} />
+                )}
+              </IconButton>
+            </Link>
+            <Link to="/inbox">
+              <IconButton>
+                {activePage === '/inbox' ? (
+                  <SendIcon className={classes.icon} />
+                ) : (
+                  <SendOutlinedIcon className={classes.icon} />
+                )}
+              </IconButton>
+            </Link>
+
+            <Link to="/explore">
+              <IconButton>
+                {activePage === '/explore' ? (
+                  <ExploreIcon className={classes.icon} />
+                ) : (
+                  <ExploreOutlinedIcon className={classes.icon} />
+                )}
+              </IconButton>
+            </Link>
+
+            <Link to="/notification">
+              <IconButton>
+                {activePage === '/notification' ? (
+                  <FavoriteIcon className={classes.icon} />
+                ) : (
+                  <FavoriteBorderOutlinedIcon
+                    className={classes.icon}
+                  />
+                )}
+              </IconButton>
+            </Link>
+
+            <Link to="/profile">
+              <Avatar
+                className={classes.avatarIcon}
+                alt="Profile"
+                src="https://cdn.iconscout.com/icon/free/png-512/avatar-372-456324.png"
+              />
+            </Link>
+          </Box>
+        </Container>
+      </Toolbar>
+    </AppBar>
   );
 };
 
-export default Header;
+export default Header2;

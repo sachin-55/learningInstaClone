@@ -21,7 +21,6 @@ const MessagePage = () => {
   const [info, setInfo] = useState({});
 
   useEffect(() => {
-    console.log(process.env.HOST_API);
     if (socket) {
       socket.on('message', (data) => {
         setMessageHistory((msg) => [...msg, data]);
@@ -71,7 +70,6 @@ const MessagePage = () => {
 
   return (
     <Box>
-      <Header />
       <Container
         sx={{
           width: '71%',

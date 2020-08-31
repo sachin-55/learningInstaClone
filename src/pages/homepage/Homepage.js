@@ -1,7 +1,6 @@
 import React from 'react';
 import { Box, Container, Image } from 'theme-ui';
 import { Link } from 'react-router-dom';
-import Header from '../../components/Header';
 import Story from './Story';
 import Suggestions from './Suggestions';
 import Post from './Post';
@@ -9,7 +8,6 @@ import Post from './Post';
 const Homepage = () => {
   return (
     <Box>
-      <Header />
       <Container
         sx={{
           width: '71%',
@@ -30,7 +28,7 @@ const Homepage = () => {
           <Box
             sx={{
               position: 'fixed',
-              top: '80px',
+              top: '65px',
               width: '320px',
               padding: '30px 0  0 30px',
             }}
