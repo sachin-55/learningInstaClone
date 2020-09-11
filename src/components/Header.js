@@ -68,12 +68,17 @@ const Header2 = () => {
     <AppBar position="fixed" className={classes.appBar} elevation={0}>
       <Toolbar className={classes.toolbar}>
         <Container className={classes.wrapper} disableGutters>
-          <Typography className={classes.instagram}>
-            Instagram
-          </Typography>
+          <Link to="/">
+            <Typography className={classes.instagram}>
+              Instagram
+            </Typography>
+          </Link>
           <Box className={classes.iconWrapper}>
             <Link to="/">
-              <IconButton>
+              <IconButton
+                disableRipple
+                style={{ background: 'none' }}
+              >
                 {activePage === '/' ? (
                   <HomeIcon className={classes.icon} />
                 ) : (
@@ -82,7 +87,10 @@ const Header2 = () => {
               </IconButton>
             </Link>
             <Link to="/inbox">
-              <IconButton>
+              <IconButton
+                disableRipple
+                style={{ background: 'none' }}
+              >
                 {activePage === '/inbox' ? (
                   <SendIcon className={classes.icon} />
                 ) : (
@@ -92,7 +100,10 @@ const Header2 = () => {
             </Link>
 
             <Link to="/explore">
-              <IconButton>
+              <IconButton
+                disableRipple
+                style={{ background: 'none' }}
+              >
                 {activePage === '/explore' ? (
                   <ExploreIcon className={classes.icon} />
                 ) : (
@@ -102,7 +113,10 @@ const Header2 = () => {
             </Link>
 
             <Link to="/notification">
-              <IconButton>
+              <IconButton
+                disableRipple
+                style={{ background: 'none' }}
+              >
                 {activePage === '/notification' ? (
                   <FavoriteIcon className={classes.icon} />
                 ) : (

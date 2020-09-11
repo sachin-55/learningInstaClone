@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Box, Container, Input, Button, Image } from 'theme-ui';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFacebookSquare } from '@fortawesome/free-brands-svg-icons';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 
+import { useMutation } from '@apollo/client';
 import ios from '../images/ios-download.png';
 import android from '../images/android-download.png';
 import backgroundImg from '../images/background.png';
@@ -11,15 +12,54 @@ import firstImage from '../images/firstimage.jpg';
 import secondImage from '../images/secondImage.jpg';
 import ButtonCustom from '../components/ButtonCustom';
 import Footer from '../components/Footer';
+import { loginMutation } from '../queries/queries';
 
 const Landingpage = (props) => {
-  const [imageMob, setImageMob] = React.useState(firstImage);
+  const [imageMob, setImageMob] = useState(firstImage);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  const [login] = useMutation(loginMutation);
+  const history = useHistory();
+
   const toggleImage = () => {
     setTimeout(() => {
       setImageMob((i) =>
         i === firstImage ? secondImage : firstImage,
       );
     }, 5000);
+  };
+
+  const handleLogin = async () => {
+    try {
+      const response = await login({
+        variables: {
+          email,
+          password,
+        },
+      });
+      setEmail('');
+      setEmail('');
+      setPassword('');
+      const userData = await response.data;
+      const data = {
+        id: userData.login.id,
+        fullname: userData.login.fullname,
+        username: userData.login.username,
+        email: userData.login.email,
+      };
+      props.setUser(data);
+      alert(userData.login.token);
+      localStorage.setItem('user', JSON.stringify(data));
+      localStorage.setItem('token', userData.login.token);
+      localStorage.setItem('login', true);
+      history.push('/');
+      setTimeout(() => {
+        window.location.reload();
+      }, 400);
+    } catch (error) {
+      console.error(error);
+    }
   };
   return (
     <Box onLoad={toggleImage}>
@@ -99,6 +139,8 @@ const Landingpage = (props) => {
                   fontSize: '12px',
                   '&::placeholder': { color: '#94979b' },
                 }}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
               />
               <Input
                 type="password"
@@ -107,10 +149,12 @@ const Landingpage = (props) => {
                   fontSize: '12px',
                   '&::placeholder': { color: '#94979b' },
                 }}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
               />
               <ButtonCustom
-                // disabled
-                onClick={props.clickLogin}
+                disabled={!email || !password}
+                onClick={handleLogin}
               >
                 Log In
               </ButtonCustom>

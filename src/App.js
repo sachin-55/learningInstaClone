@@ -20,6 +20,8 @@ import '../reset.css';
 import './scss/all.scss';
 import './scss/fonts.scss';
 
+import userContext from './context/userContext';
+
 import Landingpage from './pages/Landingpage';
 import SignupPage from './pages/SignupPage';
 
@@ -32,62 +34,63 @@ import Profile from './pages/Profile';
 import Notification from './pages/Notification';
 
 const client = new ApolloClient({
-  uri: 'http://localhost:8000/graphiql',
+  uri: `${process.env.HOST_API}graphiql`,
   cache: new InMemoryCache(),
 });
 
 const App = () => {
+  const [user, setUser] = useState({});
   const [login, setLogin] = useState(false);
   useEffect(() => {
     if (localStorage.getItem('login')) {
       setLogin(true);
     }
+    if (localStorage.getItem('user')) {
+      setUser(JSON.parse(localStorage.getItem('user')));
+    }
   }, []);
   return (
-    <ThemeProvider theme={theme}>
-      <MUIThemeProvider theme={muiTheme}>
-        <ApolloProvider client={client}>
-          <Router>
-            {login === false ? (
-              <Switch>
-                <Route exact path="/">
-                  <Landingpage
-                    clickLogin={() => {
-                      setLogin(true);
-                      localStorage.setItem('login', true);
-                    }}
-                  />
-                </Route>
-                <Route path="/signup">
-                  <SignupPage />
-                </Route>
-              </Switch>
-            ) : (
-              <>
-                <Header />
+    <userContext.Provider value={user}>
+      <ThemeProvider theme={theme}>
+        <MUIThemeProvider theme={muiTheme}>
+          <ApolloProvider client={client}>
+            <Router>
+              {login === false ? (
                 <Switch>
                   <Route exact path="/">
-                    <Homepage />
+                    <Landingpage setUser={setUser} />
                   </Route>
-                  <Route path="/inbox">
-                    <MessagePage />
-                  </Route>
-                  <Route path="/explore">
-                    <Explore />
-                  </Route>
-                  <Route path="/notification">
-                    <Notification />
-                  </Route>
-                  <Route path="/profile">
-                    <Profile />
+                  <Route path="/signup">
+                    <SignupPage setUser={setUser} />
                   </Route>
                 </Switch>
-              </>
-            )}
-          </Router>
-        </ApolloProvider>
-      </MUIThemeProvider>
-    </ThemeProvider>
+              ) : (
+                <>
+                  <Header />
+                  <Switch>
+                    <Route exact path="/">
+                      <Homepage />
+                    </Route>
+                    <Route path="/inbox">
+                      <MessagePage />
+                    </Route>
+                    <Route path="/explore">
+                      <Explore />
+                    </Route>
+                    <Route path="/notification">
+                      <Notification />
+                    </Route>
+                    <Route path="/profile">
+                      <Profile />
+                    </Route>
+                  </Switch>
+                </>
+              )}
+            </Router>
+          </ApolloProvider>
+        </MUIThemeProvider>
+      </ThemeProvider>
+    </userContext.Provider>
   );
 };
 

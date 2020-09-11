@@ -1,17 +1,30 @@
 import React from 'react';
-import { Typography } from '@material-ui/core';
-
-import BookList from '../components/BookList';
-import AddBook from '../components/AddBook';
+import { Link, useHistory } from 'react-router-dom';
+import { Box, Button } from 'theme-ui';
 
 const Profile = () => {
+  const history = useHistory();
+  const handleLogout = () => {
+    localStorage.clear();
+    history.push('/');
+    setTimeout(() => {
+      window.location.reload();
+    }, 400);
+  };
   return (
-    <div>
-      Profile
-      <Typography variant="h1">Reading List</Typography>
-      <BookList />
-      <AddBook />
-    </div>
+    <Box sx={{ marginTop: '60px' }}>
+      <Button
+        onClick={handleLogout}
+        sx={{
+          width: '100px',
+          marginX: '45%',
+          cursor: 'pointer',
+          '&:active': { bg: 'green' },
+        }}
+      >
+        Logout
+      </Button>
+    </Box>
   );
 };
 

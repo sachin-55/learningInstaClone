@@ -1,11 +1,15 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Box, Container, Image } from 'theme-ui';
 import { Link } from 'react-router-dom';
+
+import userContext from '../../context/userContext';
+
 import Story from './Story';
 import Suggestions from './Suggestions';
 import Post from './Post';
 
-const Homepage = () => {
+const Homepage = (props) => {
+  const user = useContext(userContext);
   return (
     <Box>
       <Container
@@ -45,8 +49,8 @@ const Homepage = () => {
                 src="https://media.sproutsocial.com/uploads/2017/02/10x-featured-social-media-image-size.png"
               />
               <Box sx={{ padding: '15px', marginBottom: '20px' }}>
-                <Box sx={{ fontWeight: 'bold' }}> Username</Box>
-                <Box sx={{ color: 'darkGray' }}>FullName</Box>
+                <Box sx={{ fontWeight: 'bold' }}>{user.username}</Box>
+                <Box sx={{ color: 'darkGray' }}>{user.fullname}</Box>
               </Box>
               <Box />
             </Box>

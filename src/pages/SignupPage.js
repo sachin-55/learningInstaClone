@@ -1,15 +1,60 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Box, Input, Button, Image } from 'theme-ui';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFacebookSquare } from '@fortawesome/free-brands-svg-icons';
 
+import { useMutation } from '@apollo/client';
 import ios from '../images/ios-download.png';
 import android from '../images/android-download.png';
 import ButtonCustom from '../components/ButtonCustom';
 import Footer from '../components/Footer';
+import { signupMutation } from '../queries/queries';
 
-const SignupPage = () => {
+const SignupPage = (props) => {
+  const [fullname, setFullname] = useState('');
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  const [signup] = useMutation(signupMutation);
+  const history = useHistory();
+
+  const handleSignUp = async () => {
+    try {
+      const response = await signup({
+        variables: {
+          fullname,
+          username,
+          email,
+          password,
+        },
+      });
+      setEmail('');
+      setPassword('');
+      setFullname('');
+      setUsername('');
+
+      const data = {
+        id: response.data.id,
+        fullname: response.data.fullname,
+        username: response.data.username,
+        email: response.data.email,
+      };
+      props.setUser(data);
+
+      localStorage.setItem('user', JSON.stringify(data));
+      localStorage.setItem('token', response.data.token);
+      localStorage.setItem('login', true);
+      history.push('/');
+      setTimeout(() => {
+        window.location.reload();
+      }, 400);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
     <>
       <Box
@@ -125,6 +170,8 @@ const SignupPage = () => {
                   fontSize: '12px',
                   '&::placeholder': { color: '#94979b' },
                 }}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
               />
               <Input
                 type="text"
@@ -133,6 +180,8 @@ const SignupPage = () => {
                   fontSize: '12px',
                   '&::placeholder': { color: '#94979b' },
                 }}
+                value={fullname}
+                onChange={(e) => setFullname(e.target.value)}
               />
               <Input
                 type="text"
@@ -141,6 +190,8 @@ const SignupPage = () => {
                   fontSize: '12px',
                   '&::placeholder': { color: '#94979b' },
                 }}
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
               />
               <Input
                 type="password"
@@ -149,8 +200,17 @@ const SignupPage = () => {
                   fontSize: '12px',
                   '&::placeholder': { color: '#94979b' },
                 }}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
               />
-              <ButtonCustom disabled>Log In</ButtonCustom>
+              <ButtonCustom
+                disabled={
+                  !fullname || !email || !password || !username
+                }
+                onClick={handleSignUp}
+              >
+                Sign Up
+              </ButtonCustom>
             </Box>
 
             <Box
