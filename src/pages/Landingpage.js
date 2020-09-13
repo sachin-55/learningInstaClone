@@ -49,7 +49,6 @@ const Landingpage = (props) => {
         email: userData.login.email,
       };
       props.setUser(data);
-      alert(userData.login.token);
       localStorage.setItem('user', JSON.stringify(data));
       localStorage.setItem('token', userData.login.token);
       localStorage.setItem('login', true);

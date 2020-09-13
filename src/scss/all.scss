@@ -64,8 +64,13 @@ a {
   content: '';
   position: absolute;
 }
+
+.story {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none;
+  scroll-behavior: smooth;
+}
 .story::-webkit-scrollbar {
-  // width: 10px;
   display: none;
 }
 
