@@ -14,6 +14,31 @@ const theme = createMuiTheme({
       main: '#dbdbdb',
     },
   },
+  overrides: {
+    MuiButton: {
+      root: {
+        textTransform: 'none',
+      },
+      contained: {
+        backgroundColor: '#0195f6',
+        color: '#fff',
+        '&:hover': {
+          backgroundColor: '#0195f6',
+          color: '#fff',
+        },
+      },
+    },
+  },
+  props: {
+    MuiButton: {
+      variant: 'contained',
+      fullWidth: 'true',
+      disableElevation: 'true',
+      disableFocusRipple: 'true',
+      disableTouchRipple: 'true',
+      disableRipple: 'true',
+    },
+  },
 });
 
 export default theme;
