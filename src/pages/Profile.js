@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useHistory } from 'react-router-dom';
 import {
   Avatar,
@@ -8,6 +8,10 @@ import {
   Typography,
   Input,
 } from '@material-ui/core';
+import ProfilePosts from '../components/ProfilePosts';
+import ProfileSaved from '../components/ProfileSaved';
+import ProfileTagged from '../components/ProfileTagged';
+import ProfileIgtv from '../components/ProfileIgtv';
 
 const useStyles = makeStyles({
   profileHeaderWrapper: {
@@ -65,10 +69,65 @@ const useStyles = makeStyles({
   fullname: {
     fontWeight: 'bold',
   },
+  postWrapper: {
+    width: '950px',
+    margin: '0 auto',
+  },
+  menuWrapper: {
+    display: 'flex',
+    alignItems: 'center',
+    margin: '0 auto',
+    paddingLeft: '27%',
+  },
+  menuPost: {
+    marginRight: 80,
+    paddingTop: 15,
+    fontWeight: 'bold',
+    fontSize: 13.5,
+    letterSpacing: 1,
+    transform: 'translateY(-1px)',
+    borderTop: (props) =>
+      props.active === 'post' ? '1px solid #000' : 'none',
+    cursor: 'pointer',
+  },
+  menuIGTV: {
+    marginRight: 80,
+    paddingTop: 15,
+    fontWeight: 'bold',
+    fontSize: 13.5,
+    letterSpacing: 1,
+    transform: 'translateY(-1px)',
+    borderTop: (props) =>
+      props.active === 'igtv' ? '1px solid #000' : 'none',
+    cursor: 'pointer',
+  },
+  menuSaved: {
+    marginRight: 80,
+    paddingTop: 15,
+    fontWeight: 'bold',
+    fontSize: 13.5,
+    letterSpacing: 1,
+    transform: 'translateY(-1px)',
+    borderTop: (props) =>
+      props.active === 'saved' ? '1px solid #000' : 'none',
+    cursor: 'pointer',
+  },
+  menuTagged: {
+    marginRight: 80,
+    paddingTop: 15,
+    fontWeight: 'bold',
+    fontSize: 13.5,
+    letterSpacing: 1,
+    transform: 'translateY(-1px)',
+    borderTop: (props) =>
+      props.active === 'tagged' ? '1px solid #000' : 'none',
+    cursor: 'pointer',
+  },
 });
 
 const Profile = () => {
-  const classes = useStyles();
+  const [active, setActive] = useState('post');
+  const classes = useStyles({ active });
 
   const history = useHistory();
   const handleLogout = () => {
@@ -126,11 +185,41 @@ const Profile = () => {
         </Box>
       </Box>
       <Box className={classes.postWrapper}>
+        <Box className={classes.menuWrapper}>
+          <Typography
+            className={classes.menuPost}
+            onClick={() => setActive('post')}
+          >
+            POSTS
+          </Typography>
+          <Typography
+            className={classes.menuIGTV}
+            onClick={() => setActive('igtv')}
+          >
+            IGTV
+          </Typography>
+          <Typography
+            className={classes.menuSaved}
+            onClick={() => setActive('saved')}
+          >
+            SAVED
+          </Typography>
+          <Typography
+            className={classes.menuTagged}
+            onClick={() => setActive('tagged')}
+          >
+            TAGGED
+          </Typography>
+        </Box>
         <Box>
-          <Typography>Posts</Typography>
-          <Box>
-            <Input type="file" />
-          </Box>
+          {
+            {
+              post: <ProfilePosts />,
+              igtv: <ProfileIgtv />,
+              saved: <ProfileSaved />,
+              tagged: <ProfileTagged />,
+            }[active]
+          }
         </Box>
       </Box>
       <Button

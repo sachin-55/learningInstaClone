@@ -28,6 +28,40 @@ const theme = createMuiTheme({
         },
       },
     },
+    MuiTextField: {
+      root: {
+        width: '100%',
+      },
+    },
+    MuiOutlinedInput: {
+      root: {
+        '&$focused $notchedOutline': {
+          border: '2px solid black',
+          borderColor: '#dbdbdb',
+        },
+        '&$disabled $notchedOutline': {
+          border: '1px solid black',
+          borderColor: '#dbdbdb',
+        },
+      },
+      input: {
+        color: 'black',
+        borderRadius: 'none',
+        '&::placeholder': {
+          color: '#0008',
+        },
+        padding: '10px',
+        '&:disabled': {
+          color: '#0007',
+          cursor: 'not-allowed',
+        },
+      },
+      notchedOutline: {
+        borderWidth: '1px',
+        borderColor: '#dbdbdb',
+        borderRadius: '3px',
+      },
+    },
   },
   props: {
     MuiButton: {

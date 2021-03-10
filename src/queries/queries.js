@@ -34,29 +34,35 @@ const loginMutation = gql`
   }
 `;
 
-const getBooksQuery = gql`
-  {
-    books {
-      name
-      genre
-    }
-  }
-`;
-
-const getAuthorsQuery = gql`
-  {
-    authors {
-      name
+const getUserAllPosts = gql`
+  query($userId: ID!) {
+    userPosts(userId: $userId) {
       id
+      postUrl
+      caption
+      location
     }
   }
 `;
 
-const addBookMutation = gql`
-  mutation($name: String!, $genre: String!, $authorId: ID!) {
-    addBook(name: $name, genre: $genre, authorId: $authorId) {
-      name
-      genre
+const addUserPost = gql`
+  mutation Post(
+    $caption: String!
+    $postUrl: String!
+    $location: String!
+    $user: ID!
+    $mentions: [ID]
+  ) {
+    addPost(
+      caption: $caption
+      postUrl: $postUrl
+      location: $location
+      user: $user
+      mentions: $mentions
+    ) {
+      caption
+      postUrl
+      location
     }
   }
 `;
@@ -64,7 +70,6 @@ const addBookMutation = gql`
 export {
   loginMutation,
   signupMutation,
-  getAuthorsQuery,
-  getBooksQuery,
-  addBookMutation,
+  getUserAllPosts,
+  addUserPost,
 };

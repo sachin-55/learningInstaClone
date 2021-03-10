@@ -5,6 +5,7 @@ import { faFacebookSquare } from '@fortawesome/free-brands-svg-icons';
 import { Link, useHistory } from 'react-router-dom';
 
 import { useMutation } from '@apollo/client';
+import { Typography } from '@material-ui/core';
 import ios from '../images/ios-download.png';
 import android from '../images/android-download.png';
 import backgroundImg from '../images/background.png';
@@ -14,10 +15,21 @@ import ButtonCustom from '../components/ButtonCustom';
 import Footer from '../components/Footer';
 import { loginMutation } from '../queries/queries';
 
+function validateEmail(email) {
+  const re = /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
+  return re.test(String(email).toLowerCase());
+}
+
+function checkPassword(str) {
+  const re = /^(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
+  return re.test(str);
+}
+
 const Landingpage = (props) => {
   const [imageMob, setImageMob] = useState(firstImage);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [emailStatusMessage, setEmailStatusMessage] = useState('');
 
   const [login] = useMutation(loginMutation);
   const history = useHistory();
@@ -30,8 +42,27 @@ const Landingpage = (props) => {
     }, 5000);
   };
 
+  const handlePasswordChange = (event) => {
+    const { value } = event.target;
+    setPassword(value);
+  };
+
+  const handleEmailChange = (event) => {
+    const { value } = event.target;
+    setEmail(value);
+    if (validateEmail(value)) {
+      setEmailStatusMessage('');
+    } else {
+      setEmailStatusMessage('Please enter valid email.');
+    }
+  };
+
   const handleLogin = async () => {
     try {
+      if (!email && !password && emailStatusMessage) {
+        return;
+      }
+
       const response = await login({
         variables: {
           email,
@@ -132,15 +163,19 @@ const Landingpage = (props) => {
               }}
             >
               <Input
-                type="text"
+                type="email"
                 placeholder="Phone number, username, or email "
                 sx={{
                   fontSize: '12px',
                   '&::placeholder': { color: '#94979b' },
                 }}
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={handleEmailChange}
               />
+              <Typography style={{ fontSize: '10px', color: 'red' }}>
+                {emailStatusMessage}
+              </Typography>
+
               <Input
                 type="password"
                 placeholder="Password"
@@ -149,8 +184,9 @@ const Landingpage = (props) => {
                   '&::placeholder': { color: '#94979b' },
                 }}
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={handlePasswordChange}
               />
+
               <ButtonCustom
                 disabled={!email || !password}
                 onClick={handleLogin}

@@ -5,23 +5,71 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFacebookSquare } from '@fortawesome/free-brands-svg-icons';
 
 import { useMutation } from '@apollo/client';
+import { Typography } from '@material-ui/core';
 import ios from '../images/ios-download.png';
 import android from '../images/android-download.png';
 import ButtonCustom from '../components/ButtonCustom';
 import Footer from '../components/Footer';
 import { signupMutation } from '../queries/queries';
 
+function validateEmail(email) {
+  const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+  return re.test(String(email).toLowerCase());
+}
+
+function checkPassword(str) {
+  const re = /^(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
+  return re.test(str);
+}
+
 const SignupPage = (props) => {
   const [fullname, setFullname] = useState('');
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [passwordStatusMessage, setPasswordStatusMessage] = useState(
+    '',
+  );
+  const [emailStatusMessage, setEmailStatusMessage] = useState('');
 
   const [signup] = useMutation(signupMutation);
   const history = useHistory();
 
+  const handlePasswordChange = (event) => {
+    const { value } = event.target;
+    setPassword(value);
+    if (checkPassword(value)) {
+      setPasswordStatusMessage('');
+    } else {
+      setPasswordStatusMessage(
+        'Your password must be atleat 8 characters long and contains Capital and small letters, numbers and special character. ',
+      );
+    }
+  };
+
+  const handleEmailChange = (event) => {
+    const { value } = event.target;
+    setEmail(value);
+    if (validateEmail(value)) {
+      setEmailStatusMessage('');
+    } else {
+      setEmailStatusMessage('Please enter valid email.');
+    }
+  };
+
   const handleSignUp = async () => {
     try {
+      if (
+        passwordStatusMessage &&
+        emailStatusMessage &&
+        !fullname &&
+        !username &&
+        !email &&
+        !password
+      ) {
+        return;
+      }
+
       const response = await signup({
         variables: {
           fullname,
@@ -171,8 +219,11 @@ const SignupPage = (props) => {
                   '&::placeholder': { color: '#94979b' },
                 }}
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={handleEmailChange}
               />
+              <Typography style={{ fontSize: '10px', color: 'red' }}>
+                {emailStatusMessage}
+              </Typography>
               <Input
                 type="text"
                 placeholder="Full Name "
@@ -201,8 +252,11 @@ const SignupPage = (props) => {
                   '&::placeholder': { color: '#94979b' },
                 }}
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={handlePasswordChange}
               />
+              <Typography style={{ fontSize: '10px', color: 'red' }}>
+                {passwordStatusMessage}
+              </Typography>
               <ButtonCustom
                 disabled={
                   !fullname || !email || !password || !username
