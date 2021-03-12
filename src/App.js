@@ -37,9 +37,6 @@ const client = new ApolloClient({
   uri: `${process.env.HOST_API}graphiql`,
   cache: new InMemoryCache(),
 });
-console.log(process.env.HOST_API, 'API');
-console.log(process.env.CLOUDINARY_NAME, 'CLOUDINARY_NAME');
-console.log(process.env.CLOUDINARY_PRESET, 'CLOUDINARY_PRESET');
 
 const App = () => {
   const [user, setUser] = useState({});

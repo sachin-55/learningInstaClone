@@ -14,6 +14,7 @@ import secondImage from '../images/secondImage.jpg';
 import ButtonCustom from '../components/ButtonCustom';
 import Footer from '../components/Footer';
 import { loginMutation } from '../queries/queries';
+import WholePageLoading from '../components/WholePageLoading';
 
 function validateEmail(email) {
   const re = /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
@@ -30,7 +31,10 @@ const Landingpage = (props) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [emailStatusMessage, setEmailStatusMessage] = useState('');
-
+  const [
+    wholePageLoadingStatus,
+    setWholePageLoadingStatus,
+  ] = useState(false);
   const [login] = useMutation(loginMutation);
   const history = useHistory();
 
@@ -62,7 +66,7 @@ const Landingpage = (props) => {
       if (!email && !password && emailStatusMessage) {
         return;
       }
-
+      setWholePageLoadingStatus(true);
       const response = await login({
         variables: {
           email,
@@ -80,15 +84,18 @@ const Landingpage = (props) => {
         email: userData.login.email,
       };
       props.setUser(data);
+
       localStorage.setItem('user', JSON.stringify(data));
       localStorage.setItem('token', userData.login.token);
       localStorage.setItem('login', true);
       history.push('/');
+      setWholePageLoadingStatus(false);
       setTimeout(() => {
         window.location.reload();
       }, 400);
     } catch (error) {
       console.error(error);
+      setWholePageLoadingStatus(false);
     }
   };
   return (
@@ -278,7 +285,7 @@ const Landingpage = (props) => {
               fontWeight: 300,
             }}
           >
-            Don&apos;t have an account?{' '}
+            Don&apos;t have an account?
             <Link to="/signup" className="signup-link">
               Sign up
             </Link>
@@ -313,6 +320,7 @@ const Landingpage = (props) => {
         </Box>
       </Container>
       <Footer />
+      <WholePageLoading status={wholePageLoadingStatus} />
     </Box>
   );
 };

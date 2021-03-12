@@ -11,6 +11,7 @@ import android from '../images/android-download.png';
 import ButtonCustom from '../components/ButtonCustom';
 import Footer from '../components/Footer';
 import { signupMutation } from '../queries/queries';
+import WholePageLoading from '../components/WholePageLoading';
 
 function validateEmail(email) {
   const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -31,7 +32,10 @@ const SignupPage = (props) => {
     '',
   );
   const [emailStatusMessage, setEmailStatusMessage] = useState('');
-
+  const [
+    wholePageLoadingStatus,
+    setWholePageLoadingStatus,
+  ] = useState(false);
   const [signup] = useMutation(signupMutation);
   const history = useHistory();
 
@@ -69,6 +73,7 @@ const SignupPage = (props) => {
       ) {
         return;
       }
+      setWholePageLoadingStatus(true);
 
       const response = await signup({
         variables: {
@@ -82,24 +87,26 @@ const SignupPage = (props) => {
       setPassword('');
       setFullname('');
       setUsername('');
-
+      const userData = await response.data;
       const data = {
-        id: response.data.id,
-        fullname: response.data.fullname,
-        username: response.data.username,
-        email: response.data.email,
+        id: userData.signup.id,
+        fullname: userData.signup.fullname,
+        username: userData.signup.username,
+        email: userData.signup.email,
       };
       props.setUser(data);
-
       localStorage.setItem('user', JSON.stringify(data));
-      localStorage.setItem('token', response.data.token);
+      localStorage.setItem('token', userData.signup.token);
       localStorage.setItem('login', true);
       history.push('/');
+      setWholePageLoadingStatus(false);
+
       setTimeout(() => {
         window.location.reload();
       }, 400);
     } catch (error) {
       console.error(error);
+      setWholePageLoadingStatus(false);
     }
   };
 
@@ -161,7 +168,7 @@ const SignupPage = (props) => {
               <ButtonCustom
                 sx={{}}
                 onClick={() => {
-                  alert('hello');
+                  console.log('hello');
                 }}
               >
                 <Box sx={{ fontSize: '20px' }}>
@@ -331,6 +338,7 @@ const SignupPage = (props) => {
         </Box>
       </Box>
       <Footer />
+      <WholePageLoading status={wholePageLoadingStatus} />
     </>
   );
 };
