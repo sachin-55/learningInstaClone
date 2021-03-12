@@ -155,7 +155,9 @@ const ProfilePosts = () => {
   const [addPost] = useMutation(addUserPost);
 
   useEffect(() => {
+    console.log('before');
     getUserPosts({ variables: { userId: user.id } });
+    console.log('after');
   }, []);
 
   useEffect(() => {
