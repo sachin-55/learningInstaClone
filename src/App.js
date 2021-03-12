@@ -38,6 +38,9 @@ const client = new ApolloClient({
   cache: new InMemoryCache(),
 });
 console.log(process.env.HOST_API, 'API');
+console.log(process.env.HOST_API, 'API');
+console.log(process.env.HOST_API, 'API');
+
 const App = () => {
   const [user, setUser] = useState({});
   const [login, setLogin] = useState(false);
