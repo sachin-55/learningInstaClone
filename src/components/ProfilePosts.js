@@ -132,7 +132,7 @@ const useStyles = makeStyles({
   },
 });
 
-const ProfilePosts = () => {
+const ProfilePosts = ({ setPostsCount }) => {
   const classes = useStyles();
   const [openNewPost, setOpenNewPost] = useState(false);
   const [selectedFile, setSelectedFile] = useState('');
@@ -161,6 +161,7 @@ const ProfilePosts = () => {
   useEffect(() => {
     if (userPostsData) {
       setImages(userPostsData.userPosts);
+      setPostsCount(userPostsData.userPosts.length);
     }
   }, [userPostsData]);
 

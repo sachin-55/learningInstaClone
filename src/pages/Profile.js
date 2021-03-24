@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useHistory } from 'react-router-dom';
 import {
   Avatar,
@@ -8,10 +8,14 @@ import {
   Typography,
   Input,
 } from '@material-ui/core';
+import ExitToAppIcon from '@material-ui/icons/ExitToApp';
+
+import { useLazyQuery } from '@apollo/client';
 import ProfilePosts from '../components/ProfilePosts';
 import ProfileSaved from '../components/ProfileSaved';
 import ProfileTagged from '../components/ProfileTagged';
 import ProfileIgtv from '../components/ProfileIgtv';
+import { getUserProfile } from '../queries/queries';
 
 const useStyles = makeStyles({
   profileHeaderWrapper: {
@@ -35,6 +39,12 @@ const useStyles = makeStyles({
     justifyContent: 'center',
     flexDirection: 'column',
     marginTop: -10,
+    width: '100%',
+  },
+  logoutAndInfoWrapper: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
   usernameWrapper: {
     display: 'flex',
@@ -51,6 +61,17 @@ const useStyles = makeStyles({
     width: 95,
     padding: '0px 9px',
     fontWeight: 'bold',
+  },
+  logOutBtn: {
+    fontSize: 14,
+    height: 30,
+    width: 10,
+    padding: '0px',
+    background: 'inherit',
+    color: '#000',
+    '&:hover': {
+      background: '#dbdbdb',
+    },
   },
   profileData: {
     display: 'flex',
@@ -128,6 +149,36 @@ const useStyles = makeStyles({
 const Profile = () => {
   const [active, setActive] = useState('post');
   const classes = useStyles({ active });
+  const [userInfo, setUserInfo] = useState('');
+  const [followers, setFollowers] = useState([]);
+  const [following, setFollowing] = useState([]);
+  const [postsCount, setPostsCount] = useState(0);
+
+  const [
+    getUserProfileInfo,
+    { loading: userProfileInfoLoading, data: userProfile },
+  ] = useLazyQuery(getUserProfile);
+
+  const user = JSON.parse(localStorage.getItem('user'));
+
+  useEffect(() => {
+    try {
+      getUserProfileInfo({ variables: { userId: user.id } });
+    } catch (err) {
+      console.log(err);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (userProfileInfoLoading) {
+      console.log('Loading');
+    }
+    if (userProfile) {
+      setUserInfo(userProfile.userProfile[0]);
+      setFollowers(userProfile.userProfile[0].followers);
+      setFollowing(userProfile.userProfile[0].following);
+    }
+  }, [userProfileInfoLoading, userProfile]);
 
   const history = useHistory();
   const handleLogout = () => {
@@ -148,39 +199,47 @@ const Profile = () => {
         </Box>
 
         <Box className={classes.profileInfo}>
-          <Box className={classes.usernameWrapper}>
-            <Typography className={classes.username}>
-              Username
-            </Typography>
+          <Box className={classes.logoutAndInfoWrapper}>
+            <Box className={classes.usernameWrapper}>
+              <Typography className={classes.username}>
+                {userInfo && userInfo.user && userInfo.user.username}
+              </Typography>
+              <Button
+                className={classes.editProfileBtn}
+                variant="outlined"
+              >
+                Edit Profile
+              </Button>
+            </Box>
             <Button
-              className={classes.editProfileBtn}
-              variant="outlined"
+              onClick={handleLogout}
+              className={classes.logOutBtn}
             >
-              Edit Profile
+              <ExitToAppIcon />
             </Button>
           </Box>
           <Box className={classes.profileData}>
             <Typography className={classes.profilePost}>
               <Typography className={classes.profileValues}>
-                0
+                {postsCount}
               </Typography>{' '}
               posts
             </Typography>
             <Typography className={classes.profilePost}>
               <Typography className={classes.profileValues}>
-                0
+                {followers.length}
               </Typography>{' '}
               followers
             </Typography>
             <Typography className={classes.profilePost}>
               <Typography className={classes.profileValues}>
-                0
+                {following.length}
               </Typography>{' '}
               following
             </Typography>
           </Box>
           <Typography className={classes.fullname}>
-            Full name
+            {userInfo && userInfo.user && userInfo.user.fullname}
           </Typography>
         </Box>
       </Box>
@@ -214,7 +273,7 @@ const Profile = () => {
         <Box>
           {
             {
-              post: <ProfilePosts />,
+              post: <ProfilePosts setPostsCount={setPostsCount} />,
               igtv: <ProfileIgtv />,
               saved: <ProfileSaved />,
               tagged: <ProfileTagged />,
@@ -222,18 +281,6 @@ const Profile = () => {
           }
         </Box>
       </Box>
-      <Button
-        onClick={handleLogout}
-        style={{
-          width: '100px',
-          marginX: '45%',
-          cursor: 'pointer',
-          marginTop: '100px',
-          '&:active': { bg: 'green' },
-        }}
-      >
-        Logout
-      </Button>
     </Box>
   );
 };

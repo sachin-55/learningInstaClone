@@ -34,6 +34,28 @@ const loginMutation = gql`
   }
 `;
 
+const getUserProfile = gql`
+  query($userId: ID!) {
+    userProfile(userId: $userId) {
+      user {
+        id
+        fullname
+        username
+        email
+      }
+      dateOfBirth
+      followers {
+        id
+      }
+      following {
+        id
+      }
+      location
+      bio
+    }
+  }
+`;
+
 const getUserAllPosts = gql`
   query($userId: ID!) {
     userPosts(userId: $userId) {
@@ -67,9 +89,45 @@ const addUserPost = gql`
   }
 `;
 
+const queryRecentlyAddedUsers = gql`
+  query($userId: ID!) {
+    recentlyAddedUsers(userId: $userId) {
+      id
+      fullname
+      userProfile {
+        followers {
+          id
+        }
+      }
+    }
+  }
+`;
+
+const followUserMutation = gql`
+  mutation($userId: ID!, $followingId: ID!) {
+    followUser(userId: $userId, followingId: $followingId) {
+      id
+      following {
+        id
+      }
+    }
+  }
+`;
+
+const unfollowUserMutation = gql`
+  mutation($userId: ID!, $unfollowingId: ID!) {
+    unfollowUser(userId: $userId, unfollowingId: $unfollowingId) {
+      id
+    }
+  }
+`;
 export {
   loginMutation,
   signupMutation,
   getUserAllPosts,
   addUserPost,
+  queryRecentlyAddedUsers,
+  followUserMutation,
+  unfollowUserMutation,
+  getUserProfile,
 };
