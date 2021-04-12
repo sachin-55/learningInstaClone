@@ -16,6 +16,7 @@ import ProfileSaved from '../components/ProfileSaved';
 import ProfileTagged from '../components/ProfileTagged';
 import ProfileIgtv from '../components/ProfileIgtv';
 import { getUserProfile } from '../queries/queries';
+import uploadImage from '../utils/uploadImage';
 
 const useStyles = makeStyles({
   profileHeaderWrapper: {
@@ -155,6 +156,11 @@ const Profile = () => {
   const [postsCount, setPostsCount] = useState(0);
 
   const [
+    selectedProfileImageFile,
+    setSelectedProfileImageFile,
+  ] = useState();
+
+  const [
     getUserProfileInfo,
     { loading: userProfileInfoLoading, data: userProfile },
   ] = useLazyQuery(getUserProfile);
@@ -187,6 +193,19 @@ const Profile = () => {
     setTimeout(() => {
       window.location.reload();
     }, 400);
+  };
+
+  const uploadProfileImage = async () => {
+    try {
+      if (selectedProfileImageFile) {
+        const res = await uploadImage(selectedProfileImageFile);
+        if (res && res.secure_url) {
+          console.log(res.secure_url);
+        }
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
   return (
     <Box style={{ marginTop: '60px' }}>

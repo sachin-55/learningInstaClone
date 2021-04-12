@@ -1,24 +1,21 @@
-const file = e.currentTarget.files[0];
+const uploadImage = async (selectedFile) => {
+  try {
+    const formData = new FormData();
+    formData.append('file', selectedFile);
+    formData.append('upload_preset', process.env.CLOUDINARY_PRESET);
 
-const formData = new FormData();
-const url = process.env.API_URL;
-const token = localStorage.getItem('jwtToken');
-
-const config = {
-  headers: {
-    'content-type': 'multipart/form-data',
-    authorization: `Bearer ${token}`,
-  },
+    const result = await fetch(
+      `https://api.cloudinary.com/v1_1/${process.env.CLOUDINARY_NAME}/image/upload`,
+      {
+        method: 'post',
+        body: formData,
+      },
+    );
+    const res = await result.json();
+    return res;
+  } catch (error) {
+    console.log(error);
+  }
 };
-formData.append('file', file);
 
-axios
-  .post(`${url}/api/blogs/uploadImage`, formData, config)
-  .then((response) => {
-    console.log(response);
-
-    if (response.data.status === 'success') {
-    } else {
-      return alert('failed to upload file');
-    }
-  });
+export default uploadImage;

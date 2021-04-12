@@ -12,6 +12,7 @@ import {
 import { useLazyQuery, useMutation } from '@apollo/client';
 import { addUserPost, getUserAllPosts } from '../queries/queries';
 import WholePageLoading from './WholePageLoading';
+import uploadImage from '../utils/uploadImage';
 
 const imgs = [
   {
@@ -177,23 +178,8 @@ const ProfilePosts = ({ setPostsCount }) => {
       try {
         setWholePageLoadingStatus(true);
         setLoadingUpload(true);
-        // eslint-disable-next-line no-undef
-        const formData = new FormData();
-        formData.append('file', selectedFile);
-        formData.append(
-          'upload_preset',
-          process.env.CLOUDINARY_PRESET,
-        );
 
-        // eslint-disable-next-line no-undef
-        const result = await fetch(
-          `https://api.cloudinary.com/v1_1/${process.env.CLOUDINARY_NAME}/image/upload`,
-          {
-            method: 'post',
-            body: formData,
-          },
-        );
-        const res = await result.json();
+        const res = await uploadImage(selectedFile);
         if (res && res.secure_url) {
           console.log(res.secure_url);
           addPost({

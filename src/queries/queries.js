@@ -67,6 +67,25 @@ const getUserAllPosts = gql`
   }
 `;
 
+const getUserNewsFeedPosts = gql`
+  query($userId: ID!) {
+    userNewsFeedPosts(userId: $userId) {
+      id
+      postUrl
+      caption
+      location
+      user {
+        fullname
+        userProfile {
+          userProfileImages {
+            url
+          }
+        }
+      }
+    }
+  }
+`;
+
 const addUserPost = gql`
   mutation Post(
     $caption: String!
@@ -130,4 +149,5 @@ export {
   followUserMutation,
   unfollowUserMutation,
   getUserProfile,
+  getUserNewsFeedPosts,
 };

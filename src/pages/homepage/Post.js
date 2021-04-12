@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Box, Image, Input, Button } from 'theme-ui';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEllipsisH } from '@fortawesome/free-solid-svg-icons';
@@ -9,7 +9,13 @@ import {
   faComment,
 } from '@fortawesome/free-regular-svg-icons';
 
-const Post = ({ srcUrl }) => {
+const Post = ({
+  srcUrl,
+  caption,
+  location,
+  fullname,
+  userProfileImage,
+}) => {
   return (
     <Box
       sx={{
@@ -36,11 +42,11 @@ const Post = ({ srcUrl }) => {
         >
           <Image
             variant="postProfileImg"
-            src="https://media.sproutsocial.com/uploads/2017/02/10x-featured-social-media-image-size.png"
+            src={userProfileImage}
             sx={{ border: '1px solid #dbdbdb', marginRight: '18px' }}
           />
           <Box sx={{ fontWeight: 'bold', fontSize: '14px' }}>
-            Fullname
+            {fullname}
           </Box>
         </Box>
         <Box sx={{ fontSize: '14px', cursor: 'pointer' }}>
@@ -79,14 +85,24 @@ const Post = ({ srcUrl }) => {
         </Box>
       </Box>
       <Box>
-        <Box
-          sx={{
-            padding: '0 20px 10px',
-            fontWeight: 'bold',
-            fontSize: '14px',
-          }}
-        >
-          1234 likes
+        <Box>
+          <Box
+            sx={{
+              padding: '0 20px 10px',
+              fontSize: '14px',
+            }}
+          >
+            {caption}
+          </Box>
+          <Box
+            sx={{
+              padding: '0 20px 10px',
+              fontWeight: 'bold',
+              fontSize: '14px',
+            }}
+          >
+            1234 likes
+          </Box>
         </Box>
 
         <Box

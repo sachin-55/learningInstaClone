@@ -1,15 +1,33 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { Box, Container, Image } from 'theme-ui';
 import { Link } from 'react-router-dom';
-
-import userContext from '../../context/userContext';
+import { useLazyQuery } from '@apollo/client';
 
 import Story from './Story';
 import Suggestions from './Suggestions';
 import Post from './Post';
+import { getUserNewsFeedPosts } from '../../queries/queries';
 
 const Homepage = (props) => {
-  const user = useContext(userContext);
+  const user = JSON.parse(localStorage.getItem('user'));
+  const [
+    getUserNewsFeedPostsData,
+    { loading: userNewsFeedLoading, data: userNewsFeed },
+  ] = useLazyQuery(getUserNewsFeedPosts);
+
+  useEffect(() => {
+    try {
+      getUserNewsFeedPostsData({ variables: { userId: user.id } });
+    } catch (err) {
+      console.log(err);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (userNewsFeed) {
+      console.log({ userNewsFeed });
+    }
+  }, [userNewsFeed]);
   return (
     <Box>
       <Container
@@ -22,10 +40,25 @@ const Homepage = (props) => {
       >
         <Box sx={{ flex: 1, width: '100%' }}>
           <Story />
-          <Post srcUrl="https://picsum.photos/500/600" />
-          <Post srcUrl="https://picsum.photos/id/159/500/600" />
-          <Post srcUrl="https://picsum.photos/500/600" />
-          <Post srcUrl="https://picsum.photos/id/3/500/600" />
+          {userNewsFeed &&
+            userNewsFeed.userNewsFeedPosts &&
+            userNewsFeed.userNewsFeedPosts.length > 0 &&
+            userNewsFeed.userNewsFeedPosts.map((val) => (
+              <Post
+                key={val.id}
+                srcUrl={val.postUrl}
+                caption={val.caption}
+                location={val.location}
+                fullname={val.user.fullname}
+                userProfileImage={
+                  val.userProfile &&
+                  val.userProfile.userProfileImages &&
+                  val.userProfile.userProfileImages.url
+                    ? val.userProfile.userProfileImages.url
+                    : 'https://media.sproutsocial.com/uploads/2017/02/10x-featured-social-media-image-size.png'
+                }
+              />
+            ))}
         </Box>
 
         <Box sx={{ width: '320px' }}>
