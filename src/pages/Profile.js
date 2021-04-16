@@ -6,16 +6,25 @@ import {
   Button,
   makeStyles,
   Typography,
-  Input,
+  TextField,
+  FormLabel,
+  Divider,
 } from '@material-ui/core';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 
-import { useLazyQuery } from '@apollo/client';
+import { useLazyQuery, useMutation } from '@apollo/client';
 import ProfilePosts from '../components/ProfilePosts';
 import ProfileSaved from '../components/ProfileSaved';
 import ProfileTagged from '../components/ProfileTagged';
 import ProfileIgtv from '../components/ProfileIgtv';
-import { getUserProfile } from '../queries/queries';
+import PopupDialog from '../components/PopupDialog';
+import ButtonCustom from '../components/ButtonCustom';
+import WholePageLoading from '../components/WholePageLoading';
+
+import {
+  addUserProfileImage,
+  getUserProfile,
+} from '../queries/queries';
 import uploadImage from '../utils/uploadImage';
 
 const useStyles = makeStyles({
@@ -29,6 +38,7 @@ const useStyles = makeStyles({
   },
   avatarWrapper: {
     marginRight: 100,
+    cursor: 'pointer',
   },
   avatar: {
     width: 150,
@@ -145,25 +155,54 @@ const useStyles = makeStyles({
       props.active === 'tagged' ? '1px solid #000' : 'none',
     cursor: 'pointer',
   },
+  textField: {
+    display: 'none',
+  },
+  browseButton: {
+    width: '100%',
+    background: 'inherit',
+    cursor: 'pointer',
+    textAlign: 'center',
+    border: '1px solid #dbdbdb',
+    margin: '10px 0px',
+    height: '30px',
+    '&:hover': {
+      background: 'inherit',
+      color: '#000',
+    },
+  },
 });
+
+const noProfileImage =
+  'https://res.cloudinary.com/nihcas/image/upload/v1587544195/blank-profile-picture-973460_960_720_qkds5q.png';
 
 const Profile = () => {
   const [active, setActive] = useState('post');
   const classes = useStyles({ active });
   const [userInfo, setUserInfo] = useState('');
+  const [profilePicture, setProfilePicture] = useState(
+    noProfileImage,
+  );
   const [followers, setFollowers] = useState([]);
   const [following, setFollowing] = useState([]);
   const [postsCount, setPostsCount] = useState(0);
 
   const [
-    selectedProfileImageFile,
-    setSelectedProfileImageFile,
-  ] = useState();
+    wholePageLoadingStatus,
+    setWholePageLoadingStatus,
+  ] = useState(false);
+
+  const [
+    enableChangeProfilePopup,
+    setEnableChangeProfilePopup,
+  ] = useState(false);
 
   const [
     getUserProfileInfo,
     { loading: userProfileInfoLoading, data: userProfile },
   ] = useLazyQuery(getUserProfile);
+
+  const [addUserPP] = useMutation(addUserProfileImage);
 
   const user = JSON.parse(localStorage.getItem('user'));
 
@@ -183,6 +222,14 @@ const Profile = () => {
       setUserInfo(userProfile.userProfile[0]);
       setFollowers(userProfile.userProfile[0].followers);
       setFollowing(userProfile.userProfile[0].following);
+      if (
+        userProfile.userProfile[0].userProfileImages &&
+        userProfile.userProfile[0].userProfileImages.url
+      ) {
+        setProfilePicture(
+          userProfile.userProfile[0].userProfileImages.url,
+        );
+      }
     }
   }, [userProfileInfoLoading, userProfile]);
 
@@ -195,26 +242,76 @@ const Profile = () => {
     }, 400);
   };
 
-  const uploadProfileImage = async () => {
+  const uploadProfileImage = async (event) => {
     try {
-      if (selectedProfileImageFile) {
-        const res = await uploadImage(selectedProfileImageFile);
+      setWholePageLoadingStatus(true);
+      setTimeout(() => {
+        setWholePageLoadingStatus(false);
+      }, 10000);
+      const file = event.target.files[0];
+      if (file) {
+        const res = await uploadImage(file);
         if (res && res.secure_url) {
-          console.log(res.secure_url);
+          addUserPP({
+            variables: {
+              name: 'Profile Picture',
+              url: res.secure_url,
+              userProfile: userInfo.id,
+            },
+            refetchQueries: [
+              {
+                query: getUserProfile,
+                variables: { userId: user.id },
+              },
+            ],
+          });
         }
+        setWholePageLoadingStatus(false);
+        setEnableChangeProfilePopup(false);
       }
     } catch (error) {
       console.log(error);
+      setWholePageLoadingStatus(false);
     }
   };
+
+  const removeProfileImage = async () => {
+    try {
+      setWholePageLoadingStatus(true);
+      setTimeout(() => {
+        setWholePageLoadingStatus(false);
+      }, 10000);
+      addUserPP({
+        variables: {
+          name: 'Profile Picture',
+          url: noProfileImage,
+          userProfile: userInfo.id,
+        },
+        refetchQueries: [
+          {
+            query: getUserProfile,
+            variables: { userId: user.id },
+          },
+        ],
+      });
+      setEnableChangeProfilePopup(false);
+      setWholePageLoadingStatus(false);
+    } catch (error) {
+      console.log(error);
+      setWholePageLoadingStatus(false);
+    }
+  };
+
   return (
     <Box style={{ marginTop: '60px' }}>
+      <WholePageLoading status={wholePageLoadingStatus} />
+
       <Box className={classes.profileHeaderWrapper}>
-        <Box className={classes.avatarWrapper}>
-          <Avatar
-            className={classes.avatar}
-            src="https://picsum.photos/500/600"
-          />
+        <Box
+          className={classes.avatarWrapper}
+          onClick={() => setEnableChangeProfilePopup(true)}
+        >
+          <Avatar className={classes.avatar} src={profilePicture} />
         </Box>
 
         <Box className={classes.profileInfo}>
@@ -241,19 +338,19 @@ const Profile = () => {
             <Typography className={classes.profilePost}>
               <Typography className={classes.profileValues}>
                 {postsCount}
-              </Typography>{' '}
+              </Typography>
               posts
             </Typography>
             <Typography className={classes.profilePost}>
               <Typography className={classes.profileValues}>
                 {followers.length}
-              </Typography>{' '}
+              </Typography>
               followers
             </Typography>
             <Typography className={classes.profilePost}>
               <Typography className={classes.profileValues}>
                 {following.length}
-              </Typography>{' '}
+              </Typography>
               following
             </Typography>
           </Box>
@@ -300,6 +397,71 @@ const Profile = () => {
           }
         </Box>
       </Box>
+
+      <PopupDialog
+        openDialog={enableChangeProfilePopup}
+        title={
+          // eslint-disable-next-line react/jsx-wrap-multilines
+          <Typography
+            style={{
+              fontWeight: 'bold',
+              width: '300px',
+            }}
+          >
+            Change Profile Photo
+          </Typography>
+        }
+        content={
+          // eslint-disable-next-line react/jsx-wrap-multilines
+          <Box>
+            <Divider style={{ margin: '20px 0px' }} />
+            <FormLabel>
+              <TextField
+                type="file"
+                name="profilePicture"
+                onChange={uploadProfileImage}
+                className={classes.textField}
+              />
+              <ButtonCustom
+                style={{
+                  padding: '0px 30px',
+                  background: 'none',
+                  color: '#000',
+                  fontWeight: '400',
+                }}
+              >
+                Upload Photo
+              </ButtonCustom>
+            </FormLabel>
+            <Divider style={{ margin: '20px 0px' }} />
+            <Button
+              style={{
+                padding: '0px 30px',
+                background: 'none',
+                color: '#000',
+                fontWeight: '400',
+              }}
+              onClick={removeProfileImage}
+            >
+              Remove Current Photo
+            </Button>
+            <Divider style={{ margin: '20px 0px' }} />
+          </Box>
+        }
+        actions={
+          // eslint-disable-next-line react/jsx-wrap-multilines
+          <ButtonCustom
+            onClick={() => setEnableChangeProfilePopup(false)}
+            style={{
+              background: 'inherit',
+              color: '#000',
+            }}
+          >
+            Cancel
+          </ButtonCustom>
+        }
+        setOpenDialog={setEnableChangeProfilePopup}
+      />
     </Box>
   );
 };

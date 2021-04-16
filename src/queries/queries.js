@@ -37,6 +37,7 @@ const loginMutation = gql`
 const getUserProfile = gql`
   query($userId: ID!) {
     userProfile(userId: $userId) {
+      id
       user {
         id
         fullname
@@ -52,6 +53,9 @@ const getUserProfile = gql`
       }
       location
       bio
+      userProfileImages {
+        url
+      }
     }
   }
 `;
@@ -140,6 +144,20 @@ const unfollowUserMutation = gql`
     }
   }
 `;
+
+const addUserProfileImage = gql`
+  mutation($name: String!, $url: String!, $userProfile: ID!) {
+    addUserProfileImage(
+      name: $name
+      url: $url
+      userProfile: $userProfile
+    ) {
+      name
+      url
+    }
+  }
+`;
+
 export {
   loginMutation,
   signupMutation,
@@ -150,4 +168,5 @@ export {
   unfollowUserMutation,
   getUserProfile,
   getUserNewsFeedPosts,
+  addUserProfileImage,
 };

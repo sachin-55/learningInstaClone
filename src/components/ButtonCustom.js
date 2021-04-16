@@ -1,11 +1,11 @@
 import React from 'react';
-import { Box } from 'theme-ui';
+import { Box } from '@material-ui/core';
 
 const ButtonCustom = (props) => {
   return (
     <Box
       onClick={!props.disabled ? props.onClick : undefined}
-      sx={{
+      style={{
         height: '32px',
         paddingY: '10px',
         width: '100%',
@@ -22,6 +22,7 @@ const ButtonCustom = (props) => {
           backgroundColor: '#c2dcfc',
         },
         ...props.sx,
+        ...props.style,
       }}
       opacity={props.disabled ? 0.5 : 1}
       {...props.restProps}

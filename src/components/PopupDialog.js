@@ -7,7 +7,13 @@ import {
   DialogContent,
 } from '@material-ui/core';
 
-const PopupDialog = ({ openDialog, title, content, actions }) => {
+const PopupDialog = ({
+  setOpenDialog,
+  openDialog,
+  title,
+  content,
+  actions,
+}) => {
   return (
     <Box>
       <Dialog
@@ -19,9 +25,10 @@ const PopupDialog = ({ openDialog, title, content, actions }) => {
         <DialogTitle
           style={{
             textAlign: 'center',
-            backgroundColor: '#fb876b',
+            backgroundColor: 'inherit',
             padding: '5px 0',
-            color: '#fff',
+            color: '#000',
+            margin: '20px 0px -20px',
           }}
         >
           {title}
