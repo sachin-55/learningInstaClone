@@ -10,6 +10,7 @@ import {
   Avatar,
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/styles';
+import { useLazyQuery } from '@apollo/client';
 import HomeIcon from '@material-ui/icons/Home';
 import HomeOutlinedIcon from '@material-ui/icons/HomeOutlined';
 import SendIcon from '@material-ui/icons/Send';
@@ -18,6 +19,7 @@ import ExploreIcon from '@material-ui/icons/Explore';
 import ExploreOutlinedIcon from '@material-ui/icons/ExploreOutlined';
 import FavoriteIcon from '@material-ui/icons/Favorite';
 import FavoriteBorderOutlinedIcon from '@material-ui/icons/FavoriteBorderOutlined';
+import { getUserProfile } from '../queries/queries';
 
 const useStyles = makeStyles((theme) => ({
   instagram: {
@@ -57,13 +59,43 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+const noProfileImage =
+  'https://res.cloudinary.com/nihcas/image/upload/v1587544195/blank-profile-picture-973460_960_720_qkds5q.png';
+
 const Header2 = () => {
   const location = useLocation();
   const classes = useStyles({ path: location.pathname });
   const [activePage, setActivePage] = useState(location.pathname);
+  const [userInfo, setUserInfo] = useState('');
+
+  const [
+    getUserProfileInfo,
+    { loading: userProfileInfoLoading, data: userProfile },
+  ] = useLazyQuery(getUserProfile);
+
+  const user = JSON.parse(localStorage.getItem('user'));
+
   useEffect(() => {
     setActivePage(location.pathname);
   }, [location]);
+
+  useEffect(() => {
+    try {
+      getUserProfileInfo({ variables: { userId: user.id } });
+    } catch (err) {
+      console.log(err);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (userProfileInfoLoading) {
+      console.log('Loading');
+    }
+    if (userProfile) {
+      setUserInfo(userProfile.userProfile[0]);
+    }
+  }, [userProfileInfoLoading, userProfile]);
+
   return (
     <AppBar position="fixed" className={classes.appBar} elevation={0}>
       <Toolbar className={classes.toolbar}>
@@ -131,7 +163,13 @@ const Header2 = () => {
               <Avatar
                 className={classes.avatarIcon}
                 alt="Profile"
-                src="https://cdn.iconscout.com/icon/free/png-512/avatar-372-456324.png"
+                src={
+                  userInfo &&
+                  userInfo.userProfileImages &&
+                  userInfo.userProfileImages.url
+                    ? userInfo.userProfileImages.url
+                    : noProfileImage
+                }
               />
             </Link>
           </Box>
