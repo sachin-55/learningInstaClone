@@ -86,6 +86,28 @@ const getUserNewsFeedPosts = gql`
           }
         }
       }
+      comments {
+        id
+        comment
+        likes
+        created_at
+        userId {
+          id
+          fullname
+          username
+          userProfile {
+            userProfileImages {
+              url
+            }
+          }
+        }
+      }
+      created_at
+      likes {
+        userId {
+          id
+        }
+      }
     }
   }
 `;
@@ -126,6 +148,24 @@ const queryRecentlyAddedUsers = gql`
   }
 `;
 
+const getFollowings = gql`
+  query($userId: ID!) {
+    followings(userId: $userId) {
+      id
+      fullname
+      username
+      userProfile {
+        userProfileImages {
+          url
+        }
+        user {
+          id
+        }
+      }
+    }
+  }
+`;
+
 const followUserMutation = gql`
   mutation($userId: ID!, $followingId: ID!) {
     followUser(userId: $userId, followingId: $followingId) {
@@ -158,6 +198,24 @@ const addUserProfileImage = gql`
   }
 `;
 
+const addNewComment = gql`
+  mutation($userId: ID!, $comment: String!, $postId: ID!) {
+    commentPost(userId: $userId, comment: $comment, postId: $postId) {
+      comment
+    }
+  }
+`;
+
+const addLike = gql`
+  mutation($userId: ID!, $postId: ID!) {
+    likePostToggle(userId: $userId, postId: $postId) {
+      userId {
+        id
+      }
+    }
+  }
+`;
+
 export {
   loginMutation,
   signupMutation,
@@ -169,4 +227,7 @@ export {
   getUserProfile,
   getUserNewsFeedPosts,
   addUserProfileImage,
+  addNewComment,
+  addLike,
+  getFollowings,
 };

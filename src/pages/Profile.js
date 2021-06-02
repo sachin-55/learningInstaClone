@@ -26,6 +26,7 @@ import {
   getUserProfile,
 } from '../queries/queries';
 import uploadImage from '../utils/uploadImage';
+import FollowingDialog from '../components/FollowingDialog';
 
 const useStyles = makeStyles({
   profileHeaderWrapper: {
@@ -93,6 +94,10 @@ const useStyles = makeStyles({
     marginRight: 50,
     display: 'flex',
     alignItems: 'center',
+    cursor: 'pointer',
+    '&:hover': {
+      textDecoration: 'underline',
+    },
   },
   profileValues: {
     fontWeight: 'bold',
@@ -186,6 +191,10 @@ const Profile = () => {
   const [followers, setFollowers] = useState([]);
   const [following, setFollowing] = useState([]);
   const [postsCount, setPostsCount] = useState(0);
+
+  const [enabledFollowingDialog, setEnableFollowingDialog] = useState(
+    false,
+  );
 
   const [
     wholePageLoadingStatus,
@@ -347,7 +356,10 @@ const Profile = () => {
               </Typography>
               followers
             </Typography>
-            <Typography className={classes.profilePost}>
+            <Typography
+              className={classes.profilePost}
+              onClick={() => setEnableFollowingDialog(true)}
+            >
               <Typography className={classes.profileValues}>
                 {following.length}
               </Typography>
@@ -461,6 +473,11 @@ const Profile = () => {
           </ButtonCustom>
         }
         setOpenDialog={setEnableChangeProfilePopup}
+      />
+      <FollowingDialog
+        dialogStatus={enabledFollowingDialog}
+        setDialogStatus={setEnableFollowingDialog}
+        userId={user.id}
       />
     </Box>
   );

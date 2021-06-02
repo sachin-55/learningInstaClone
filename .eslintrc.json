@@ -12,6 +12,7 @@
     "no-unused-vars": "warn",
     "no-undef":"off",
     "no-console":"off",
+    "react/jsx-one-expression-per-line":"none",
     "react/jsx-filename-extension": [
       1,
       { "extensions": [".js", ".jsx"] }

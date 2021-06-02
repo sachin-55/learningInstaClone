@@ -1,21 +1,97 @@
-import React, { useEffect } from 'react';
+/* eslint-disable react/prop-types */
+import React, { useEffect, useState } from 'react';
 import { Box, Image, Input, Button } from 'theme-ui';
+import { CircularProgress } from '@material-ui/core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEllipsisH } from '@fortawesome/free-solid-svg-icons';
+import {
+  faEllipsisH,
+  faHeart as filledHeart,
+} from '@fortawesome/free-solid-svg-icons';
+import { formatDistanceToNowStrict } from 'date-fns';
 import {
   faHeart,
   faPaperPlane,
   faBookmark,
   faComment,
 } from '@fortawesome/free-regular-svg-icons';
+import { useMutation } from '@apollo/client';
+
+import { addNewComment, addLike } from '../../queries/queries';
 
 const Post = ({
+  id,
   srcUrl,
   caption,
   location,
   fullname,
   userProfileImage,
+  comments,
+  likes,
+  createdAt,
+  getUserNewsFeedPostsData,
 }) => {
+  const [newComment, setNewComment] = useState('');
+
+  const [addComment, { loading }] = useMutation(addNewComment);
+  const [addPostLike, { loading: likeLoading }] = useMutation(
+    addLike,
+  );
+
+  const user = JSON.parse(localStorage.getItem('user'));
+
+  const submitNewComment = async () => {
+    if (newComment) {
+      await addComment({
+        variables: {
+          comment: newComment,
+          userId: user.id,
+          postId: id,
+        },
+        refetchQueries: [
+          {
+            query: getUserNewsFeedPostsData,
+            variables: { userId: user.id },
+          },
+        ],
+      });
+      setNewComment('');
+    }
+  };
+
+  const toggleLike = async () => {
+    await addPostLike({
+      variables: {
+        userId: user.id,
+        postId: id,
+      },
+      refetchQueries: [
+        {
+          query: getUserNewsFeedPostsData,
+          variables: { userId: user.id },
+        },
+      ],
+    });
+    setNewComment('');
+  };
+
+  const didHaveLiked = () => {
+    const isUser =
+      likes && likes.find((x) => x.userId.id === user.id);
+    console.log({ isUser });
+    if (isUser) {
+      return true;
+    }
+    return false;
+  };
+
+  const getDate = (value) => {
+    const date = new Date(parseInt(value, 10));
+
+    return formatDistanceToNowStrict(date, {
+      addSuffix: true,
+    });
+  };
+
   return (
     <Box
       sx={{
@@ -71,7 +147,22 @@ const Post = ({
           sx={{ fontSize: '25px', display: 'flex', fontWeight: 100 }}
         >
           <Box sx={{ marginRight: '10px', cursor: 'pointer' }}>
-            <FontAwesomeIcon icon={faHeart} />
+            {likeLoading ? (
+              <Box
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}
+              >
+                <CircularProgress color="#183f73" size="15px" />
+              </Box>
+            ) : (
+              <FontAwesomeIcon
+                icon={didHaveLiked() ? filledHeart : faHeart}
+                onClick={toggleLike}
+              />
+            )}
           </Box>
           <Box sx={{ marginRight: '10px', cursor: 'pointer' }}>
             <FontAwesomeIcon icon={faComment} />
@@ -85,138 +176,71 @@ const Post = ({
         </Box>
       </Box>
       <Box>
-        <Box>
+        <Box sx={{ paddingBottom: '10px' }}>
           <Box
             sx={{
-              padding: '0 20px 10px',
+              padding: '0px 20px ',
+              fontWeight: '300',
+              fontSize: '11px',
+            }}
+          >
+            {createdAt && getDate(createdAt)}
+          </Box>
+
+          <Box
+            sx={{
+              padding: '0 20px ',
+              fontWeight: 'bold',
+              fontSize: '14px',
+            }}
+          >
+            {likes && likes.length} likes
+          </Box>
+          <Box
+            sx={{
+              padding: '0 20px ',
               fontSize: '14px',
             }}
           >
             {caption}
           </Box>
-          <Box
-            sx={{
-              padding: '0 20px 10px',
-              fontWeight: 'bold',
-              fontSize: '14px',
-            }}
-          >
-            1234 likes
-          </Box>
         </Box>
 
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            padding: '0 20px 5px',
-            justifyContent: 'space-between',
-          }}
-        >
-          <Box
-            sx={{
-              display: 'flex',
-            }}
-          >
+        {comments &&
+          comments.length > 0 &&
+          comments.map((comment) => (
             <Box
+              key={comment.id}
               sx={{
-                fontWeight: 'bold',
-                marginRight: '10px',
-                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                padding: '0 20px 5px',
+                justifyContent: 'space-between',
               }}
             >
-              username
+              <Box
+                sx={{
+                  display: 'flex',
+                }}
+              >
+                <Box
+                  sx={{
+                    fontWeight: 'bold',
+                    marginRight: '10px',
+                    cursor: 'pointer',
+                  }}
+                >
+                  {comment.userId.username}
+                </Box>
+                {comment.comment}
+                <Box></Box>
+              </Box>
+              <Box sx={{ fontWeight: 100, cursor: 'pointer' }}>
+                <FontAwesomeIcon icon={faHeart} />
+              </Box>
             </Box>
-            <Box>this is comment for above post ....hahaha</Box>
-          </Box>
-          <Box sx={{ fontWeight: 100, cursor: 'pointer' }}>
-            <FontAwesomeIcon icon={faHeart} />
-          </Box>
-        </Box>
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            padding: '0 20px 5px',
-            justifyContent: 'space-between',
-          }}
-        >
-          <Box
-            sx={{
-              display: 'flex',
-            }}
-          >
-            <Box
-              sx={{
-                fontWeight: 'bold',
-                marginRight: '10px',
-                cursor: 'pointer',
-              }}
-            >
-              username
-            </Box>
-            <Box>this is comment for above post ....hahaha</Box>
-          </Box>
-          <Box sx={{ fontWeight: 100, cursor: 'pointer' }}>
-            <FontAwesomeIcon icon={faHeart} />
-          </Box>
-        </Box>
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            padding: '0 20px 5px',
-            justifyContent: 'space-between',
-          }}
-        >
-          <Box
-            sx={{
-              display: 'flex',
-            }}
-          >
-            <Box
-              sx={{
-                fontWeight: 'bold',
-                marginRight: '10px',
-                cursor: 'pointer',
-              }}
-            >
-              username
-            </Box>
-            <Box>this is comment for above post ....hahaha</Box>
-          </Box>
-          <Box sx={{ fontWeight: 100, cursor: 'pointer' }}>
-            <FontAwesomeIcon icon={faHeart} />
-          </Box>
-        </Box>
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            padding: '0 20px 5px',
-            justifyContent: 'space-between',
-          }}
-        >
-          <Box
-            sx={{
-              display: 'flex',
-            }}
-          >
-            <Box
-              sx={{
-                fontWeight: 'bold',
-                marginRight: '10px',
-                cursor: 'pointer',
-              }}
-            >
-              username
-            </Box>
-            <Box>this is comment for above post ....hahaha</Box>
-          </Box>
-          <Box sx={{ fontWeight: 100, cursor: 'pointer' }}>
-            <FontAwesomeIcon icon={faHeart} />
-          </Box>
-        </Box>
+          ))}
+
         <Box
           sx={{
             fontSize: '10px',
@@ -236,10 +260,29 @@ const Post = ({
           <Input
             sx={{ flex: 1, border: 'none', outline: 'none' }}
             placeholder="Add a comment..."
+            onChange={(e) => setNewComment(e.target.value)}
+            value={newComment}
           />
-          <Button variant="clearBtn" sx={{}}>
-            Post
-          </Button>
+          {loading ? (
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+            >
+              <CircularProgress color="#183f73" size="15px" />
+            </Box>
+          ) : (
+            <Button
+              variant="clearBtn"
+              sx={{ cursor: 'pointer' }}
+              disabled={!newComment}
+              onClick={submitNewComment}
+            >
+              Post
+            </Button>
+          )}
         </Box>
       </Box>
     </Box>

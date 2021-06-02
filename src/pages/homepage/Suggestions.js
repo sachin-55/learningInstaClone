@@ -5,16 +5,20 @@ import {
   queryRecentlyAddedUsers,
   followUserMutation,
 } from '../../queries/queries';
+import { CircularProgress } from '@material-ui/core';
 
 const Suggestions = () => {
   const [recentlyAddedUsers, setRecentlyAddedUsers] = useState([]);
+  const [followingIds, setFollowingIds] = useState([]);
 
   const [
     getRecentlyAddedUsers,
     { data: recentlyAddedUsersData },
-  ] = useLazyQuery(queryRecentlyAddedUsers);
+  ] = useLazyQuery(queryRecentlyAddedUsers, {
+    fetchPolicy: 'cache-and-network',
+  });
 
-  const [followUser] = useMutation(followUserMutation);
+  const [followUser, { loading }] = useMutation(followUserMutation);
 
   const user = JSON.parse(localStorage.getItem('user'));
 
@@ -40,9 +44,9 @@ const Suggestions = () => {
     }
   }, [recentlyAddedUsersData]);
 
-  const handleFollowUser = (followingUserId) => {
+  const handleFollowUser = async (followingUserId) => {
     try {
-      followUser({
+      await followUser({
         variables: {
           userId: user.id,
           followingId: followingUserId,
@@ -54,6 +58,10 @@ const Suggestions = () => {
           },
         ],
       });
+      setRecentlyAddedUsers((x) =>
+        x.filter((f) => f.id !== followingUserId),
+      );
+      setFollowingIds((x) => x.filter((f) => f !== followingUserId));
     } catch (error) {
       console.log(error);
     }
@@ -119,18 +127,33 @@ const Suggestions = () => {
                 </Box>
               </Box>
             </Box>
-            <Box
-              sx={{
-                color: '#0195f6',
-                fontSize: '12px',
-                fontWeight: 'bold',
-                padding: '0 2px',
-                cursor: 'pointer',
-              }}
-              onClick={() => handleFollowUser(userInfo.id)}
-            >
-              Follow
-            </Box>
+            {loading && followingIds.includes(userInfo.id) ? (
+              <Box
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}
+              >
+                <CircularProgress color="#183f73" size="15px" />
+              </Box>
+            ) : (
+              <Box
+                sx={{
+                  color: '#0195f6',
+                  fontSize: '12px',
+                  fontWeight: 'bold',
+                  padding: '0 2px',
+                  cursor: 'pointer',
+                }}
+                onClick={() => {
+                  handleFollowUser(userInfo.id);
+                  setFollowingIds((x) => [...x, userInfo.id]);
+                }}
+              >
+                Follow
+              </Box>
+            )}
           </Box>
         ))}
     </Box>

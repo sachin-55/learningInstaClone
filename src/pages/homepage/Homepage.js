@@ -13,7 +13,9 @@ const Homepage = (props) => {
   const [
     getUserNewsFeedPostsData,
     { loading: userNewsFeedLoading, data: userNewsFeed },
-  ] = useLazyQuery(getUserNewsFeedPosts);
+  ] = useLazyQuery(getUserNewsFeedPosts, {
+    fetchPolicy: 'cache-and-network',
+  });
 
   useEffect(() => {
     try {
@@ -21,7 +23,7 @@ const Homepage = (props) => {
     } catch (err) {
       console.log(err);
     }
-  }, []);
+  }, [userNewsFeed]);
 
   useEffect(() => {
     if (userNewsFeed) {
@@ -44,20 +46,28 @@ const Homepage = (props) => {
             userNewsFeed.userNewsFeedPosts &&
             userNewsFeed.userNewsFeedPosts.length > 0 &&
             userNewsFeed.userNewsFeedPosts.map((val) => (
-              <Post
-                key={val.id}
-                srcUrl={val.postUrl}
-                caption={val.caption}
-                location={val.location}
-                fullname={val.user.fullname}
-                userProfileImage={
-                  val.userProfile &&
-                  val.userProfile.userProfileImages &&
-                  val.userProfile.userProfileImages.url
-                    ? val.userProfile.userProfileImages.url
-                    : 'https://media.sproutsocial.com/uploads/2017/02/10x-featured-social-media-image-size.png'
-                }
-              />
+              <>
+                <Post
+                  key={val.id}
+                  id={val.id}
+                  srcUrl={val.postUrl}
+                  caption={val.caption}
+                  location={val.location}
+                  fullname={val.user.fullname}
+                  likes={val.likes}
+                  comments={val.comments}
+                  createdAt={val.created_at}
+                  getUserNewsFeedPostsData={getUserNewsFeedPosts}
+                  userProfileImage={
+                    val.user &&
+                    val.user.userProfile &&
+                    val.user.userProfile.userProfileImages &&
+                    val.user.userProfile.userProfileImages.url
+                      ? val.user.userProfile.userProfileImages.url
+                      : 'https://media.sproutsocial.com/uploads/2017/02/10x-featured-social-media-image-size.png'
+                  }
+                />
+              </>
             ))}
         </Box>
 
