@@ -12,6 +12,7 @@ import ButtonCustom from '../components/ButtonCustom';
 import Footer from '../components/Footer';
 import { signupMutation } from '../queries/queries';
 import WholePageLoading from '../components/WholePageLoading';
+import { useSetUser } from '../contexts/userContext';
 
 function validateEmail(email) {
   const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -38,6 +39,8 @@ const SignupPage = (props) => {
   ] = useState(false);
   const [signup] = useMutation(signupMutation);
   const history = useHistory();
+
+  const setUserContext = useSetUser();
 
   const handlePasswordChange = (event) => {
     const { value } = event.target;
@@ -95,6 +98,7 @@ const SignupPage = (props) => {
         email: userData.signup.email,
       };
       props.setUser(data);
+      setUserContext(data);
       localStorage.setItem('user', JSON.stringify(data));
       localStorage.setItem('token', userData.signup.token);
       localStorage.setItem('login', true);

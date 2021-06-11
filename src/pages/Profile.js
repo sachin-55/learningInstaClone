@@ -227,7 +227,7 @@ const Profile = () => {
     if (userProfileInfoLoading) {
       console.log('Loading');
     }
-    if (userProfile) {
+    if (userProfile && userProfile.userProfile[0]) {
       setUserInfo(userProfile.userProfile[0]);
       setFollowers(userProfile.userProfile[0].followers);
       setFollowing(userProfile.userProfile[0].following);

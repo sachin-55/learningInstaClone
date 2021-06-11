@@ -166,6 +166,63 @@ const getFollowings = gql`
   }
 `;
 
+const getUniqueUsers = gql`
+  query($userIds: [ID]) {
+    uniqueUsers(userIds: $userIds) {
+      id
+      fullname
+      username
+      userProfile {
+        id
+        userProfileImages {
+          url
+        }
+      }
+    }
+  }
+`;
+
+const getGroup = gql`
+  query($userId: ID!) {
+    getUserGroup(userId: $userId) {
+      id
+      members {
+        id
+      }
+      groupType
+      backgroundImage
+    }
+  }
+`;
+
+const getUserConversations = gql`
+  query($groupId: ID!) {
+    getUserConversations(groupId: $groupId) {
+      id
+      created_at
+      groupId {
+        id
+        backgroundImage
+        members {
+          id
+          fullname
+          username
+          userProfile {
+            userProfileImages {
+              url
+            }
+          }
+        }
+      }
+      senderId {
+        id
+      }
+      message
+      seen
+    }
+  }
+`;
+
 const followUserMutation = gql`
   mutation($userId: ID!, $followingId: ID!) {
     followUser(userId: $userId, followingId: $followingId) {
@@ -230,4 +287,7 @@ export {
   addNewComment,
   addLike,
   getFollowings,
+  getUniqueUsers,
+  getGroup,
+  getUserConversations,
 };

@@ -15,6 +15,7 @@ import ButtonCustom from '../components/ButtonCustom';
 import Footer from '../components/Footer';
 import { loginMutation } from '../queries/queries';
 import WholePageLoading from '../components/WholePageLoading';
+import { useSetUser } from '../contexts/userContext';
 
 function validateEmail(email) {
   const re = /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
@@ -37,7 +38,7 @@ const Landingpage = (props) => {
   ] = useState(false);
   const [login] = useMutation(loginMutation);
   const history = useHistory();
-
+  const setUserContext = useSetUser();
   const toggleImage = () => {
     setTimeout(() => {
       setImageMob((i) =>
@@ -54,6 +55,7 @@ const Landingpage = (props) => {
   const handleEmailChange = (event) => {
     const { value } = event.target;
     setEmail(value);
+
     if (validateEmail(value)) {
       setEmailStatusMessage('');
     } else {
@@ -84,6 +86,7 @@ const Landingpage = (props) => {
         email: userData.login.email,
       };
       props.setUser(data);
+      setUserContext(data);
 
       localStorage.setItem('user', JSON.stringify(data));
       localStorage.setItem('token', userData.login.token);

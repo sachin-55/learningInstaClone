@@ -77,7 +77,6 @@ const Post = ({
   const didHaveLiked = () => {
     const isUser =
       likes && likes.find((x) => x.userId.id === user.id);
-    console.log({ isUser });
     if (isUser) {
       return true;
     }

@@ -20,8 +20,6 @@ import '../reset.css';
 import './scss/all.scss';
 import './scss/fonts.scss';
 
-import userContext from './context/userContext';
-
 import Landingpage from './pages/Landingpage';
 import SignupPage from './pages/SignupPage';
 
@@ -32,6 +30,9 @@ import MessagePage from './pages/message/MessagePage';
 import Explore from './pages/Explore';
 import Profile from './pages/Profile';
 import Notification from './pages/Notification';
+
+import { SocketProvider } from './contexts/socketContext';
+import { UserProvider } from './contexts/userContext';
 
 const client = new ApolloClient({
   uri: `${process.env.HOST_API}graphiql`,
@@ -49,8 +50,9 @@ const App = () => {
       setUser(JSON.parse(localStorage.getItem('user')));
     }
   }, []);
+
   return (
-    <userContext.Provider value={user}>
+    <UserProvider>
       <ThemeProvider theme={theme}>
         <MUIThemeProvider theme={muiTheme}>
           <ApolloProvider client={client}>
@@ -66,31 +68,33 @@ const App = () => {
                 </Switch>
               ) : (
                 <>
-                  <Header />
-                  <Switch>
-                    <Route exact path="/">
-                      <Homepage />
-                    </Route>
-                    <Route path="/inbox">
-                      <MessagePage />
-                    </Route>
-                    <Route path="/explore">
-                      <Explore />
-                    </Route>
-                    <Route path="/notification">
-                      <Notification />
-                    </Route>
-                    <Route path="/profile">
-                      <Profile />
-                    </Route>
-                  </Switch>
+                  <SocketProvider>
+                    <Header />
+                    <Switch>
+                      <Route exact path="/">
+                        <Homepage />
+                      </Route>
+                      <Route path="/inbox">
+                        <MessagePage />
+                      </Route>
+                      <Route path="/explore">
+                        <Explore />
+                      </Route>
+                      <Route path="/notification">
+                        <Notification />
+                      </Route>
+                      <Route path="/profile">
+                        <Profile />
+                      </Route>
+                    </Switch>
+                  </SocketProvider>
                 </>
               )}
             </Router>
           </ApolloProvider>
         </MUIThemeProvider>
       </ThemeProvider>
-    </userContext.Provider>
+    </UserProvider>
   );
 };
 
