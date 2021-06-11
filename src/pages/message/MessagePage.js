@@ -42,6 +42,11 @@ const MessagePage = () => {
     setActiveUserConversation,
   ] = useState([]);
 
+  const [
+    nonActiveUserConversation,
+    setNonActiveUserConversation,
+  ] = useState({});
+
   const setRef = useCallback((node) => {
     if (node) {
       node.scrollIntoView({ smooth: true });
@@ -120,6 +125,7 @@ const MessagePage = () => {
       });
 
       socket.on('receive-message', (data) => {
+        console.log({ data });
         setMessageReceived(data);
       });
     }
@@ -185,6 +191,8 @@ const MessagePage = () => {
           lastSeen: Date.now(),
           groupId: grUser.id,
           bgImage: grUser.backgroundImage,
+          members: grUser.members,
+          groupType: grUser.groupType,
         };
       });
       setUserContacts(users);
@@ -201,6 +209,11 @@ const MessagePage = () => {
             groupId: activeUser.groupId,
           },
         });
+        setNonActiveUserConversation((messages) =>
+          Object.keys(messages).filter(
+            (x) => x !== activeUser.groupId,
+          ),
+        );
       }
     } catch (error) {
       console.log(error);
@@ -216,26 +229,30 @@ const MessagePage = () => {
   }, [conversationData]);
 
   useEffect(() => {
-    console.log({ messageReceived });
     if (messageReceived && messageReceived._id) {
-      const copyChat = [...activeUserConversation];
-      console.log({ copyChat });
-      if (copyChat && copyChat.length > 0) {
-        const group = copyChat[0].groupId;
-        const updatedMessage = {
-          id: messageReceived._id,
-          created_at: Date.parse(messageReceived.created_at),
-          groupId: group,
-          senderId: {
-            id: messageReceived.senderId,
-          },
-          message: messageReceived.message,
-          seen: messageReceived.seen,
-        };
+      const updatedMessage = {
+        id: messageReceived._id,
+        created_at: Date.parse(messageReceived.created_at),
+        groupId: {
+          id: messageReceived.groupId,
+        },
+        senderId: {
+          id: messageReceived.senderId,
+        },
+        message: messageReceived.message,
+        seen: messageReceived.seen,
+      };
 
+      if (messageReceived.groupId === activeUser.groupId) {
+        const copyChat = [...activeUserConversation];
         copyChat.push(updatedMessage);
-
         setActiveUserConversation(copyChat);
+      } else {
+        const gid = messageReceived.groupId;
+        setNonActiveUserConversation((messages) => ({
+          ...messages,
+          [gid]: updatedMessage,
+        }));
       }
     }
   }, [messageReceived]);
@@ -251,25 +268,23 @@ const MessagePage = () => {
       },
       (msg) => {
         const copyChat = [...activeUserConversation];
-        if (copyChat && copyChat.length > 0) {
-          const group = copyChat[0].groupId;
-          console.log({ msg });
-          const updatedMessage = {
-            id: msg._id,
-            created_at: Date.parse(msg.created_at),
-            groupId: group,
-            senderId: {
-              id: msg.senderId,
-            },
-            message: msg.message,
-            seen: msg.seen,
-          };
+        const updatedMessage = {
+          id: msg._id,
+          created_at: Date.parse(msg.created_at),
+          groupId: {
+            id: activeUser.groupId,
+          },
+          senderId: {
+            id: msg.senderId,
+          },
+          message: msg.message,
+          seen: msg.seen,
+        };
 
-          console.log({ updatedMessage });
-          copyChat.push(updatedMessage);
-          setActiveUserConversation(copyChat);
-          setMessage('');
-        }
+        console.log({ updatedMessage });
+        copyChat.push(updatedMessage);
+        setActiveUserConversation(copyChat);
+        setMessage('');
       },
     );
   };
@@ -293,18 +308,28 @@ const MessagePage = () => {
   const getUserInfo = (members, senderId) => {
     let userInfo = {};
     if (senderId === user.id) {
-      const u = members.find((x) => x.id === senderId);
-      userInfo = { ...u, status: 'sender' };
+      const u = members.find((x) => x.id === user.id);
+      userInfo = {
+        ...u,
+        status: 'sender',
+        url:
+          (u.userProfile &&
+            u.userProfile.userProfileImages &&
+            u.userProfile.userProfileImages.url) ||
+          'noImage',
+      };
     } else {
-      const u = members.find((x) => x.id !== senderId);
-      userInfo = { ...u, status: 'receiver' };
+      const u = members.find((x) => x.id !== user.id);
+      userInfo = {
+        ...u,
+        status: 'receiver',
+        url: activeUser.image,
+      };
     }
-    userInfo.url =
-      (userInfo.userProfile.userProfileImages &&
-        userInfo.userProfile.userProfileImages.url) ||
-      'noImage';
+
     return userInfo;
   };
+
   const getActualDate = (value) => {
     const date = new Date(parseInt(value, 10));
 
@@ -395,7 +420,15 @@ const MessagePage = () => {
                       }}
                     />
                   </Box>
-                  <Box>
+                  <Box
+                    sx={{
+                      fontWeight: Object.keys(
+                        nonActiveUserConversation,
+                      ).includes(userContact.groupId)
+                        ? '700'
+                        : '400',
+                    }}
+                  >
                     <Text>{userContact.fullname}</Text>
                     <Text>{userContact.username}</Text>
                   </Box>
@@ -424,11 +457,11 @@ const MessagePage = () => {
                 padding: '11px 20px',
               }}
             >
-              <Image
+              <Avatar
                 variant="inboxProfileImg"
                 src={activeUser && activeUser.image}
-                sx={{
-                  border: `1px solid ${
+                style={{
+                  border: `3px solid ${
                     activeUser && activeUser.online
                       ? 'green'
                       : '#dbdbdb'
@@ -446,7 +479,9 @@ const MessagePage = () => {
                     fontWeight: 400,
                   }}
                 >
-                  {activeUser && getDate(activeUser.lastSeen)}
+                  {activeUser &&
+                    ((activeUser.online && 'Online') ||
+                      getDate(activeUser.lastSeen))}
                 </Text>
               </Box>
             </Box>
@@ -476,122 +511,130 @@ const MessagePage = () => {
                       key={msg.id}
                       ref={lastMessage ? setRef : null}
                     >
-                      {getUserInfo(
-                        msg.groupId.members,
-                        msg.senderId.id,
-                      ).status === 'sender' ? (
+                      <Box
+                        sx={{
+                          mb: '10px',
+                          display: 'flex',
+                          justifyContent: `${
+                            getUserInfo(
+                              activeUser.members,
+                              msg.senderId.id,
+                            ).status === 'sender'
+                              ? 'flex-end'
+                              : 'flex-start'
+                          }`,
+                          alignItems: 'center',
+                          wordWrap: 'break-word',
+                          wordBreak: 'break-all',
+                          width: '100%',
+                        }}
+                      >
                         <Box
                           sx={{
-                            mb: '10px',
+                            my: '5px',
                             display: 'flex',
-                            justifyContent: 'flex-end',
-                            alignItems: 'center',
-                            wordWrap: 'break-word',
-                            wordBreak: 'break-all',
-                            width: '100%',
+                            flexDirection: 'column',
+                            alignItems: `${
+                              getUserInfo(
+                                activeUser.members,
+                                msg.senderId.id,
+                              ).status === 'sender'
+                                ? 'flex-end'
+                                : 'flex-start'
+                            }`,
                           }}
                         >
                           <Box
                             sx={{
-                              border: '1px solid #dbdbdb',
-                              width: '75%',
                               display: 'flex',
-                              justifyContent: 'flex-end',
-                              alignItems: 'center',
-                              borderTopLeftRadius: '50px',
-                              borderBottomLeftRadius: '50px',
-                              paddingLeft: '20px',
-                              backgroundColor: 'rgba(10,10,50,0.1)',
-                            }}
-                          >
-                            <Text
-                              sx={{
-                                textAlign: 'right',
-                              }}
-                            >
-                              {msg.message}
-                              <Text
-                                sx={{
-                                  mb: '10px',
-                                  fontSize: '12px',
-                                  color: '#bdbdbd',
-                                }}
-                              >
-                                {getActualDate(msg.created_at)}
-                              </Text>
-                            </Text>
-                            <Box
-                              sx={{
-                                ml: '10px',
-                                color: '#fcfcfc',
-                                padding: '10px 5px',
-                                textAlign: 'right',
-                              }}
-                            >
-                              <Avatar
-                                src={
-                                  getUserInfo(
-                                    msg.groupId.members,
-                                    msg.senderId.id,
-                                  ).url
-                                }
-                                style={{
-                                  width: '20px',
-                                  height: '20px',
-                                }}
-                              />
-                            </Box>
-                          </Box>
-                        </Box>
-                      ) : (
-                        <Box
-                          sx={{
-                            border: '1px solid #dbdbdb',
-                            display: 'flex',
-                            alignItems: 'center',
-                            width: '75%',
-                            wordWrap: 'break-word',
-                            wordBreak: 'break-all',
-                            borderTopRightRadius: '50px',
-                            borderBottomRightRadius: '50px',
-                            backgroundColor: 'rgba(10,50,10,0.1)',
-                            mb: '10px',
-                          }}
-                        >
-                          <Box
-                            sx={{
-                              mr: '10px',
-                              color: '#fcfcfc',
-                              padding: '10px 5px',
-                            }}
-                          >
-                            <Avatar
-                              src={
+                              flexDirection: 'column',
+                              alignItems: `${
                                 getUserInfo(
-                                  msg.groupId.members,
+                                  activeUser.members,
                                   msg.senderId.id,
-                                ).url
-                              }
-                              style={{
-                                width: '20px',
-                                height: '20px',
-                              }}
-                            />
-                          </Box>
-                          <Text>
-                            {msg.message}
+                                ).status === 'sender'
+                                  ? 'flex-end'
+                                  : 'flex-start'
+                              }`,
+                              backgroundColor: `${
+                                getUserInfo(
+                                  activeUser.members,
+                                  msg.senderId.id,
+                                ).status === 'sender'
+                                  ? 'rgba(50,50,100,0.9)'
+                                  : 'rgba(20,150,50,0.9)'
+                              }`,
+                              color: `${
+                                getUserInfo(
+                                  activeUser.members,
+                                  msg.senderId.id,
+                                ).status === 'sender'
+                                  ? '#fff'
+                                  : '#fcfcfc'
+                              }`,
+                              borderRadius: '5px',
+                              padding: '5px',
+                            }}
+                          >
                             <Text
                               sx={{
-                                mb: '10px',
-                                fontSize: '12px',
-                                color: '#bdbdbd',
+                                fontSize: '10px',
+                                color: `${
+                                  getUserInfo(
+                                    activeUser.members,
+                                    msg.senderId.id,
+                                  ).status === 'sender'
+                                    ? '#bdbdbd'
+                                    : '#fcfcfc'
+                                }`,
                               }}
                             >
                               {getActualDate(msg.created_at)}
                             </Text>
-                          </Text>
+                            <Text>{msg.message}</Text>
+                          </Box>
+                          <Box
+                            sx={{
+                              display: 'flex',
+                              flexDirection: `${
+                                getUserInfo(
+                                  activeUser.members,
+                                  msg.senderId.id,
+                                ).status === 'sender'
+                                  ? 'row'
+                                  : 'row-reverse'
+                              }`,
+                              alignItems: 'baseline',
+                            }}
+                          >
+                            <Text
+                              sx={{
+                                fontSize: '10px',
+                                color: '#a0a0a0',
+                              }}
+                            >
+                              {
+                                getUserInfo(
+                                  activeUser.members,
+                                  msg.senderId.id,
+                                ).fullname
+                              }
+                            </Text>
+                            <Avatar
+                              src={
+                                getUserInfo(
+                                  activeUser.members,
+                                  msg.senderId.id,
+                                ).url
+                              }
+                              style={{
+                                width: '15px',
+                                height: '15px',
+                              }}
+                            />
+                          </Box>
                         </Box>
-                      )}
+                      </Box>
                     </Box>
                   );
                 })}

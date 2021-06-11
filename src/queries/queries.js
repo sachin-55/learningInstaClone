@@ -188,6 +188,13 @@ const getGroup = gql`
       id
       members {
         id
+        fullname
+        username
+        userProfile {
+          userProfileImages {
+            url
+          }
+        }
       }
       groupType
       backgroundImage
@@ -202,16 +209,8 @@ const getUserConversations = gql`
       created_at
       groupId {
         id
-        backgroundImage
         members {
           id
-          fullname
-          username
-          userProfile {
-            userProfileImages {
-              url
-            }
-          }
         }
       }
       senderId {
