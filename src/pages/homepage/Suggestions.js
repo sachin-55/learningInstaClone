@@ -39,6 +39,7 @@ const Suggestions = () => {
       setRecentlyAddedUsers(
         recentlyAddedUsersData.recentlyAddedUsers,
       );
+      console.log(recentlyAddedUsersData.recentlyAddedUsers);
     } else {
       setRecentlyAddedUsers([]);
     }
@@ -67,6 +68,9 @@ const Suggestions = () => {
     }
   };
 
+  const handleSeeAll = () => {
+    console.log('See All');
+  };
   return (
     <Box>
       <Box
@@ -85,7 +89,14 @@ const Suggestions = () => {
         >
           Suggestions For You
         </Box>
-        <Box sx={{ fontSize: '12px', fontWeight: 'bold' }}>
+        <Box
+          sx={{
+            fontSize: '12px',
+            fontWeight: 'bold',
+            cursor: 'pointer',
+          }}
+          onClick={handleSeeAll}
+        >
           See All
         </Box>
       </Box>
@@ -105,7 +116,12 @@ const Suggestions = () => {
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
               <Image
                 variant="suggestionProfileImg"
-                src="https://media.sproutsocial.com/uploads/2017/02/10x-featured-social-media-image-size.png"
+                src={
+                  (userInfo.userProfile &&
+                    userInfo.userProfile.userProfileImages &&
+                    userInfo.userProfile.userProfileImages.url) ||
+                  'https://media.sproutsocial.com/uploads/2017/02/10x-featured-social-media-image-size.png'
+                }
               />
               <Box sx={{ paddingLeft: '12px' }}>
                 <Box sx={{ fontSize: '14px', fontWeight: 'bold' }}>

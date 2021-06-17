@@ -336,6 +336,27 @@ const MessagePage = () => {
     return format(date, "yyyy/MM/dd','hh:mm:ss");
   };
 
+  const isUserValidToChat = (userId) => {
+    if (commonUsers.includes(userId)) {
+      return { status: true };
+    } else {
+      if (noFollowingIds.includes(userId)) {
+        return {
+          message:
+            'You have not followed user, follow user to have conversation',
+          status: false,
+        };
+      }
+      if (noFollowBackIds.includes(userId)) {
+        return {
+          message:
+            'Your have not been follow back by this user to have conversation.',
+          status: false,
+        };
+      }
+    }
+  };
+
   return (
     <Box>
       <Container
@@ -489,52 +510,35 @@ const MessagePage = () => {
               <FontAwesomeIcon icon={faInfoCircle} />
             </Box>
           </Box>
-          <Box sx={{ position: 'relative', height: '90%' }}>
-            <Box
-              sx={{
-                height: '80%',
-                bg: '#fff',
-                padding: '10px',
-                overflowY: 'scroll',
-                overflowX: 'hidden',
-                wordBreak: 'break-all',
-              }}
-              id="messageList"
-            >
-              {activeUserConversation &&
-                activeUserConversation.length > 0 &&
-                activeUserConversation.map((msg, index) => {
-                  const lastMessage =
-                    activeUserConversation.length - 1 === index;
-                  return (
-                    <Box
-                      key={msg.id}
-                      ref={lastMessage ? setRef : null}
-                    >
+          {isUserValidToChat(activeUser.id) &&
+          isUserValidToChat(activeUser.id).status ? (
+            <Box sx={{ position: 'relative', height: '90%' }}>
+              <Box
+                sx={{
+                  height: '80%',
+                  bg: '#fff',
+                  padding: '10px',
+                  overflowY: 'scroll',
+                  overflowX: 'hidden',
+                  wordBreak: 'break-all',
+                }}
+                id="messageList"
+              >
+                {activeUserConversation &&
+                  activeUserConversation.length > 0 &&
+                  activeUserConversation.map((msg, index) => {
+                    const lastMessage =
+                      activeUserConversation.length - 1 === index;
+                    return (
                       <Box
-                        sx={{
-                          mb: '10px',
-                          display: 'flex',
-                          justifyContent: `${
-                            getUserInfo(
-                              activeUser.members,
-                              msg.senderId.id,
-                            ).status === 'sender'
-                              ? 'flex-end'
-                              : 'flex-start'
-                          }`,
-                          alignItems: 'center',
-                          wordWrap: 'break-word',
-                          wordBreak: 'break-all',
-                          width: '100%',
-                        }}
+                        key={msg.id}
+                        ref={lastMessage ? setRef : null}
                       >
                         <Box
                           sx={{
-                            my: '5px',
+                            mb: '10px',
                             display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: `${
+                            justifyContent: `${
                               getUserInfo(
                                 activeUser.members,
                                 msg.senderId.id,
@@ -542,10 +546,15 @@ const MessagePage = () => {
                                 ? 'flex-end'
                                 : 'flex-start'
                             }`,
+                            alignItems: 'center',
+                            wordWrap: 'break-word',
+                            wordBreak: 'break-all',
+                            width: '100%',
                           }}
                         >
                           <Box
                             sx={{
+                              my: '5px',
                               display: 'flex',
                               flexDirection: 'column',
                               alignItems: `${
@@ -556,125 +565,147 @@ const MessagePage = () => {
                                   ? 'flex-end'
                                   : 'flex-start'
                               }`,
-                              backgroundColor: `${
-                                getUserInfo(
-                                  activeUser.members,
-                                  msg.senderId.id,
-                                ).status === 'sender'
-                                  ? 'rgba(50,50,100,0.9)'
-                                  : 'rgba(20,150,50,0.9)'
-                              }`,
-                              color: `${
-                                getUserInfo(
-                                  activeUser.members,
-                                  msg.senderId.id,
-                                ).status === 'sender'
-                                  ? '#fff'
-                                  : '#fcfcfc'
-                              }`,
-                              borderRadius: '5px',
-                              padding: '5px',
                             }}
                           >
-                            <Text
+                            <Box
                               sx={{
-                                fontSize: '10px',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: `${
+                                  getUserInfo(
+                                    activeUser.members,
+                                    msg.senderId.id,
+                                  ).status === 'sender'
+                                    ? 'flex-end'
+                                    : 'flex-start'
+                                }`,
+                                backgroundColor: `${
+                                  getUserInfo(
+                                    activeUser.members,
+                                    msg.senderId.id,
+                                  ).status === 'sender'
+                                    ? 'rgba(50,50,100,0.9)'
+                                    : 'rgba(20,150,50,0.9)'
+                                }`,
                                 color: `${
                                   getUserInfo(
                                     activeUser.members,
                                     msg.senderId.id,
                                   ).status === 'sender'
-                                    ? '#bdbdbd'
+                                    ? '#fff'
                                     : '#fcfcfc'
                                 }`,
+                                borderRadius: '5px',
+                                padding: '5px',
                               }}
                             >
-                              {getActualDate(msg.created_at)}
-                            </Text>
-                            <Text>{msg.message}</Text>
-                          </Box>
-                          <Box
-                            sx={{
-                              display: 'flex',
-                              flexDirection: `${
-                                getUserInfo(
-                                  activeUser.members,
-                                  msg.senderId.id,
-                                ).status === 'sender'
-                                  ? 'row'
-                                  : 'row-reverse'
-                              }`,
-                              alignItems: 'baseline',
-                            }}
-                          >
-                            <Text
+                              <Text
+                                sx={{
+                                  fontSize: '10px',
+                                  color: `${
+                                    getUserInfo(
+                                      activeUser.members,
+                                      msg.senderId.id,
+                                    ).status === 'sender'
+                                      ? '#bdbdbd'
+                                      : '#fcfcfc'
+                                  }`,
+                                }}
+                              >
+                                {getActualDate(msg.created_at)}
+                              </Text>
+                              <Text>{msg.message}</Text>
+                            </Box>
+                            <Box
                               sx={{
-                                fontSize: '10px',
-                                color: '#a0a0a0',
+                                display: 'flex',
+                                flexDirection: `${
+                                  getUserInfo(
+                                    activeUser.members,
+                                    msg.senderId.id,
+                                  ).status === 'sender'
+                                    ? 'row'
+                                    : 'row-reverse'
+                                }`,
+                                alignItems: 'baseline',
                               }}
                             >
-                              {
-                                getUserInfo(
-                                  activeUser.members,
-                                  msg.senderId.id,
-                                ).fullname
-                              }
-                            </Text>
-                            <Avatar
-                              src={
-                                getUserInfo(
-                                  activeUser.members,
-                                  msg.senderId.id,
-                                ).url
-                              }
-                              style={{
-                                width: '15px',
-                                height: '15px',
-                              }}
-                            />
+                              <Text
+                                sx={{
+                                  fontSize: '10px',
+                                  color: '#a0a0a0',
+                                }}
+                              >
+                                {
+                                  getUserInfo(
+                                    activeUser.members,
+                                    msg.senderId.id,
+                                  ).fullname
+                                }
+                              </Text>
+                              <Avatar
+                                src={
+                                  getUserInfo(
+                                    activeUser.members,
+                                    msg.senderId.id,
+                                  ).url
+                                }
+                                style={{
+                                  width: '15px',
+                                  height: '15px',
+                                }}
+                              />
+                            </Box>
                           </Box>
                         </Box>
                       </Box>
-                    </Box>
-                  );
-                })}
-            </Box>
-            <Box
-              sx={{
-                position: 'absolute',
-                bottom: '20px',
-                margin: '0 25px',
-                padding: '0 30px',
-                borderRadius: '50px',
-                border: '1px solid lightGray',
-                display: 'flex',
-                alignItems: 'center',
-                fontSize: '30px',
-                justifyContent: 'space-evenly',
-                width: '90%',
-              }}
-            >
-              <FontAwesomeIcon icon={faSmile} />
-              <Input
-                placeholder="Message..."
-                type="text"
-                value={message}
+                    );
+                  })}
+              </Box>
+              <Box
                 sx={{
-                  fontSize: '16px',
-                  border: 'none',
-                  outline: 'none ',
-                  background: 'none',
-                  width: '70%',
+                  position: 'absolute',
+                  bottom: '20px',
+                  margin: '0 25px',
+                  padding: '0 30px',
+                  borderRadius: '50px',
+                  border: '1px solid lightGray',
+                  display: 'flex',
+                  alignItems: 'center',
+                  fontSize: '30px',
+                  justifyContent: 'space-evenly',
+                  width: '90%',
                 }}
-                onChange={(e) => {
-                  setMessage(e.target.value);
-                }}
-                onKeyPress={handleKeyPress}
-              />
-              <FontAwesomeIcon icon={faImage} />
-              <FontAwesomeIcon icon={faHeart} />
+              >
+                <FontAwesomeIcon icon={faSmile} />
+                <Input
+                  placeholder="Message..."
+                  type="text"
+                  value={message}
+                  sx={{
+                    fontSize: '16px',
+                    border: 'none',
+                    outline: 'none ',
+                    background: 'none',
+                    width: '70%',
+                  }}
+                  onChange={(e) => {
+                    setMessage(e.target.value);
+                  }}
+                  onKeyPress={handleKeyPress}
+                />
+                <FontAwesomeIcon icon={faImage} />
+                <FontAwesomeIcon icon={faHeart} />
+              </Box>
             </Box>
-          </Box>
+          ) : (
+            <Box>
+              <Text sx={{ margin: '100px 0px', textAlign: 'center' }}>
+                {isUserValidToChat(activeUser.id) &&
+                  isUserValidToChat(activeUser.id).message}
+              </Text>
+            </Box>
+          )}
         </Box>
       </Container>
     </Box>

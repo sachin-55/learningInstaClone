@@ -143,6 +143,9 @@ const queryRecentlyAddedUsers = gql`
         followers {
           id
         }
+        userProfileImages {
+          url
+        }
       }
     }
   }
@@ -151,6 +154,24 @@ const queryRecentlyAddedUsers = gql`
 const getFollowings = gql`
   query($userId: ID!) {
     followings(userId: $userId) {
+      id
+      fullname
+      username
+      userProfile {
+        userProfileImages {
+          url
+        }
+        user {
+          id
+        }
+      }
+    }
+  }
+`;
+
+const getFollowers = gql`
+  query($userId: ID!) {
+    followers(userId: $userId) {
       id
       fullname
       username
@@ -286,6 +307,7 @@ export {
   addNewComment,
   addLike,
   getFollowings,
+  getFollowers,
   getUniqueUsers,
   getGroup,
   getUserConversations,

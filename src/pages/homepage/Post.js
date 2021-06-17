@@ -157,10 +157,22 @@ const Post = ({
                 <CircularProgress color="#183f73" size="15px" />
               </Box>
             ) : (
-              <FontAwesomeIcon
-                icon={didHaveLiked() ? filledHeart : faHeart}
-                onClick={toggleLike}
-              />
+              <>
+                {didHaveLiked() && (
+                  <FontAwesomeIcon
+                    color="red"
+                    icon={filledHeart}
+                    onClick={toggleLike}
+                  />
+                )}
+                {!didHaveLiked() && (
+                  <FontAwesomeIcon
+                    color="black"
+                    icon={faHeart}
+                    onClick={toggleLike}
+                  />
+                )}
+              </>
             )}
           </Box>
           <Box sx={{ marginRight: '10px', cursor: 'pointer' }}>
@@ -179,8 +191,8 @@ const Post = ({
           <Box
             sx={{
               padding: '0px 20px ',
-              fontWeight: '300',
-              fontSize: '11px',
+              fontWeight: '100',
+              fontSize: '10px',
             }}
           >
             {createdAt && getDate(createdAt)}
@@ -240,7 +252,7 @@ const Post = ({
             </Box>
           ))}
 
-        <Box
+        {/* <Box
           sx={{
             fontSize: '10px',
             fontWeight: 100,
@@ -248,7 +260,7 @@ const Post = ({
           }}
         >
           3 HOURS AGO
-        </Box>
+        </Box> */}
         <Box
           sx={{
             display: 'flex',

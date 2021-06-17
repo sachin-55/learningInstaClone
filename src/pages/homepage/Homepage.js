@@ -1,12 +1,15 @@
 import React, { useContext, useEffect } from 'react';
 import { Box, Container, Image } from 'theme-ui';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import { useLazyQuery } from '@apollo/client';
 
 import Story from './Story';
 import Suggestions from './Suggestions';
 import Post from './Post';
-import { getUserNewsFeedPosts } from '../../queries/queries';
+import {
+  getUserNewsFeedPosts,
+  getUserProfile,
+} from '../../queries/queries';
 
 const Homepage = (props) => {
   const user = JSON.parse(localStorage.getItem('user'));
@@ -16,6 +19,21 @@ const Homepage = (props) => {
   ] = useLazyQuery(getUserNewsFeedPosts, {
     fetchPolicy: 'cache-and-network',
   });
+
+  const [
+    getUserProfileInfo,
+    { loading: userProfileInfoLoading, data: userProfileData },
+  ] = useLazyQuery(getUserProfile);
+
+  const history = useHistory();
+
+  useEffect(() => {
+    try {
+      getUserProfileInfo({ variables: { userId: user.id } });
+    } catch (err) {
+      console.log(err);
+    }
+  }, []);
 
   useEffect(() => {
     try {
@@ -30,6 +48,13 @@ const Homepage = (props) => {
       console.log({ userNewsFeed });
     }
   }, [userNewsFeed]);
+
+  useEffect(() => {
+    if (userProfileData) {
+      console.log({ userProfileData });
+    }
+  }, [userProfileData]);
+
   return (
     <Box>
       <Container
@@ -89,10 +114,23 @@ const Homepage = (props) => {
             >
               <Image
                 variant="profileLink"
-                src="https://media.sproutsocial.com/uploads/2017/02/10x-featured-social-media-image-size.png"
+                src={
+                  (userProfileData &&
+                    userProfileData.userProfile[0] &&
+                    userProfileData.userProfile[0]
+                      .userProfileImages &&
+                    userProfileData.userProfile[0].userProfileImages
+                      .url) ||
+                  'https://media.sproutsocial.com/uploads/2017/02/10x-featured-social-media-image-size.png'
+                }
               />
               <Box sx={{ padding: '15px', marginBottom: '20px' }}>
-                <Box sx={{ fontWeight: 'bold' }}>{user.username}</Box>
+                <Box
+                  sx={{ fontWeight: 'bold', cursor: 'pointer' }}
+                  onClick={() => history.push('profile')}
+                >
+                  {user.username}
+                </Box>
                 <Box sx={{ color: 'darkGray' }}>{user.fullname}</Box>
               </Box>
               <Box />
